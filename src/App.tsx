@@ -1,58 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import { useEffect } from 'react'
+import { ThemeProvider } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+import theme from './theme/theme'
+import { Switch, Route } from 'react-router-dom'
+import Routes from './Routes'
+import { useAppDispatch } from './app/hooks'
+import { minimaInit } from './minima.init'
+import NavigationBar from './layout/NavigationBar'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
-  );
+const App = () => {
+    const dispatch = useAppDispatch()
+
+    useEffect(() => {
+        dispatch(minimaInit())
+    }, [dispatch])
+
+    return (
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <NavigationBar />
+            <Switch>
+                {Routes.map((route: any) => (
+                    <Route exact path={route.path} key={route.path}>
+                        <route.component />
+                    </Route>
+                ))}
+            </Switch>
+        </ThemeProvider>
+    )
 }
-
-export default App;
+export default App
