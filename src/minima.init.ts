@@ -1,7 +1,8 @@
 import { createAsyncThunk, createAction, createSlice } from '@reduxjs/toolkit'
 import Minima_Service from './minima.service'
 import { RootState, AppThunk } from './app/store'
-import { createBidContract, createAuctionContract, createContracts } from './appInit.slice'
+import { generateWalletAddress, generatePublicKey, createContracts } from './appInit.slice'
+import { listAuctions } from './features/marketplace/marketplace.state'
 
 export interface InitState {
     connected: boolean
@@ -22,6 +23,8 @@ const enum MinimaEventTypes {
     NETWORK = 'network',
     TXPOWSTART = 'txpowstart',
     TXPOWEND = 'txpowend',
+    MINIMGSTART = 'miningstart',
+    MININGSTOP = 'miningstop',
 }
 
 export const initSlice = createSlice({
@@ -55,11 +58,12 @@ export const minimaInit = (): AppThunk => (dispatch, getState) => {
             case MinimaEventTypes.CONNECTED:
                 dispatch(initSuccess())
                 dispatch(createContracts())
-                // dispatch(createBidContract())
-                // dispatch(createAuctionContract())
+                dispatch(generateWalletAddress())
+                dispatch(generatePublicKey())
                 break
             case MinimaEventTypes.NEWBLOCK:
                 dispatch(newBlock(msg.info))
+                dispatch(listAuctions())
                 break
             case MinimaEventTypes.NEWTRANSACTION:
                 dispatch(newTransaction(msg.info))
@@ -79,6 +83,12 @@ export const minimaInit = (): AppThunk => (dispatch, getState) => {
             case MinimaEventTypes.TXPOWEND:
                 dispatch(txPowEnd(msg.info))
                 break
+            case MinimaEventTypes.MINIMGSTART:
+                dispatch(miningstart(msg.info))
+                break
+            case MinimaEventTypes.MININGSTOP:
+                dispatch(miningstop(msg.info))
+                break
             default:
                 console.error('Unknown event type: ', msg.event)
         }
@@ -94,3 +104,5 @@ export const newBalance = createAction<any>('minima_event/new_balance')
 export const network = createAction<any>('minima_event/network')
 export const txPowStart = createAction<any>('minima_event/tx_pow_start')
 export const txPowEnd = createAction<any>('minima_event/tx_pow_end')
+export const miningstart = createAction<any>('minima_event/mining_start')
+export const miningstop = createAction<any>('minima_event/mining_stop')
