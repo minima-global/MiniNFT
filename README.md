@@ -1,3 +1,19 @@
+# Auction
+
+1. You created the auction (coins auctionContract relevant:true) (yourAuctions)
+
+2. You did not create the auction, but (coins auctionContract relevant:false)
+    1. You created a bid on that auction, or (yourBids n auctions on tokenId)
+    2. You did not create the auction, or any bid on it (nothing to do with you)
+
+# Bid
+
+1. You created the bid (coins bidContract relevant:true) (yourBids)
+
+2. You did not create the bid, but (coins bidContract relevant:false)
+    1. You created the auction with that bid in it, or (yourAuctions n bids on tokenId)
+    2. You did not create the bid, or the auction its on (nothing to do with you)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
 
 ## Available Scripts

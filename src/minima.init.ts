@@ -3,6 +3,8 @@ import Minima_Service from './minima.service'
 import { RootState, AppThunk } from './app/store'
 import { generateWalletAddress, generatePublicKey, createContracts } from './appInit.slice'
 import { listAuctions } from './features/marketplace/marketplace.state'
+import { listBidsMade } from './features/your-bids/bid.state'
+import { fetchNfts } from './features/nft-wallet/nftwallet.state'
 
 export interface InitState {
     connected: boolean
@@ -64,6 +66,9 @@ export const minimaInit = (): AppThunk => (dispatch, getState) => {
             case MinimaEventTypes.NEWBLOCK:
                 dispatch(newBlock(msg.info))
                 dispatch(listAuctions())
+                dispatch(listBidsMade())
+                dispatch(fetchNfts())
+                // TODO: dispatch(getBidsOnAllAuctions())
                 break
             case MinimaEventTypes.NEWTRANSACTION:
                 dispatch(newTransaction(msg.info))

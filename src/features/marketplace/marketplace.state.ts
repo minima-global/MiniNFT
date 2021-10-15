@@ -13,6 +13,25 @@ export const listAuctions = (): AppThunk => (dispatch, getState) => {
     })
 }
 
+// TODO: create auction type
+export const bidOnAuction =
+    (auction: any): AppThunk =>
+    (dispatch, getState) => {
+        const state = getState()
+        const bidAddress = state.appInit.bidContractAddress
+        const myAddress = state.appInit.walletAddress
+        const myKey = state.appInit.publicKey
+        if (bidAddress === '' || myAddress === '' || myKey === '') {
+            console.error(`async error, bid address, key, or wallet is still '' when you read it`) // TODO: notification or action here
+            return
+        }
+        Minima_Service.createBidTransaction(2, bidAddress, myAddress, myKey, auction.tokenid).then((res: any) => {
+            console.log(res)
+            // TODO: dispatch soe sort of successful notification
+            // new block event will read any new bids and populate them
+        })
+    }
+
 export interface MarketplaceState {
     auctions: any[]
 }

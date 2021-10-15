@@ -4,6 +4,7 @@ import initReducer from './../minima.init'
 import reducer from '../appInit.slice'
 import marketplaceReducer from './../features/marketplace/marketplace.state'
 import nftWalletReducer from './../features/nft-wallet/nftwallet.state'
+import bidReducer from './../features/your-bids/bid.state'
 
 export const store = configureStore({
     reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
         appInit: reducer,
         marketplace: marketplaceReducer,
         nftwallet: nftWalletReducer,
+        bids: bidReducer,
     },
 })
 

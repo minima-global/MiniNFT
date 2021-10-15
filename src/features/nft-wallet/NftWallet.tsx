@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { fetchNfts, getAllMyNfts, sendNftToAuction } from './nftwallet.state'
+import React from 'react'
+import { getAllMyNfts, sendNftToAuction } from './nftwallet.state'
 import { useAppDispatch, useAppSelector } from './../../app/hooks'
 import Button from '@mui/material/Button'
 import { Token } from './../../minima.service'
@@ -7,10 +7,6 @@ import { Token } from './../../minima.service'
 const NftWallet = () => {
     const dispatch = useAppDispatch()
     const nfts = useAppSelector(getAllMyNfts)
-
-    useEffect(() => {
-        dispatch(fetchNfts())
-    }, [dispatch])
 
     const onAuctionNft = (nft: Token) => {
         return () => {

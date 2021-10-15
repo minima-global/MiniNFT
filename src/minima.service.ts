@@ -55,7 +55,7 @@ function createBidContract() {
  * @returns Promise<string>
  */
 function newAddress(): Promise<string> {
-    return new Promise(function (resolve) {
+    return new Promise(function (resolve, reject) {
         Minima.cmd('newaddress', function (res) {
             if (res.status) {
                 let addr: string = res.response.address.hexaddress
@@ -70,7 +70,7 @@ function newAddress(): Promise<string> {
  * @returns Promise<string>
  */
 function newKey() {
-    return new Promise(function (resolve) {
+    return new Promise(function (resolve, reject) {
         Minima.cmd('keys new', function (res) {
             if (res.status) {
                 let key: string = res.response.key.publickey
@@ -80,12 +80,31 @@ function newKey() {
     })
 }
 
-function getAllYourAddresses() {
+function isYourAddressOrKey(addressOrKey: string) {
+    return new Promise(function (resolve, reject) {
+        const command = `check ${addressOrKey}`
+        Minima.cmd(command, function (res) {
+            if (res.status && res.response && res.response.relevant) {
+                resolve(res.response)
+            } else {
+                reject(res)
+            }
+        })
+    })
+}
+
+// returns an array of objects that looks like
+// {
+//     "script": "RETURN SIGNEDBY ( 0x54BE088D5617F1C6401EA25C862B1DC04E9593C2 )",
+//     "hexaddress": "0xEF8B4D9FCDFA980EA0D86FD13C4A77AD439C0B71",
+//     "miniaddress": "Mx56FU3H6N7KMA5IGYN7ITYSTXVVBZYC3R"
+//  }
+function getAllYourAddresses(): Promise<any[]> {
     return new Promise((resolve, reject) => {
         const command = 'scripts'
         Minima.cmd(command, (res) => {
             if (res.status && res.response && res.response.addresses) {
-                const addresses = res.response.addresses.map((address: Address) => address.miniaddress)
+                const addresses = res.response.addresses
                 resolve(addresses)
             } else {
                 reject(res)
@@ -190,16 +209,20 @@ function listAllAuctions(auctionContractAddress: string, justMine: boolean): Pro
 }
 
 // list all the bids (coinid and tokenid), listed in the bid contract
-function listAllBids(bidsContractAddress: string) {
+function listAllBids(bidsContractAddress: string, justMine: boolean): Promise<any[]> {
     const minimaTokenId = '0x00'
     return new Promise((resolve, reject) => {
-        const command = `coins address:${bidsContractAddress} tokenid:${minimaTokenId}`
+        let command = `coins address:${bidsContractAddress} tokenid:${minimaTokenId}`
+        if (justMine) {
+            command = command + ' relevant:true'
+        }
         Minima.cmd(command, (res) => {
             if (res.status && res.response && res.response.coins) {
                 const bids = res.response.coins.map((c: any) => {
+                    // TODO: create bid object here
                     return {
                         coin: c.data.coin.coinid,
-                        tokenidIWantToBuy: c.data.prevstate[2].data,
+                        auctionTokenId: c.data.prevstate[2].data,
                         bidderAddress: c.data.prevstate[1].data,
                         bidderPubKey: c.data.prevstate[0].data,
                     }
@@ -210,6 +233,67 @@ function listAllBids(bidsContractAddress: string) {
             }
         })
     })
+}
+
+// get all bids with a flag to tell if each bid is
+// a bid you made, bid you received, or nothing to do with you
+// madeBid flag is added if its a bid you made
+async function getAllBidsYouHaveMade(bidContractAddress: string) {
+    const [allBids, relevantBids] = await Promise.all([
+        listAllBids(bidContractAddress, false),
+        listAllBids(bidContractAddress, true),
+    ])
+    const allBidsUpdated = allBids.map((bid) => {
+        const foundRelevant = relevantBids.find((relevantBid) => bid.coin === relevantBid.coin)
+        let madeBid = false
+        if (typeof foundRelevant !== 'undefined') {
+            madeBid = true
+        }
+        return {
+            ...bid,
+            madeBid,
+        }
+    })
+    return allBidsUpdated
+}
+
+// gets all bids
+// with a flag added that tells you if its your NFT token
+async function getAllBidsWithTokenOwner(bidContractAddress: string) {
+    const [allBids, allMyTokens] = await Promise.all([getAllBidsYouHaveMade(bidContractAddress), getAllMyTokens()])
+    const allBidsWithTokenOwner = allBids.map((bid) => {
+        const foundBidForYourToken = allMyTokens.find((myToken) => myToken.tokenid === bid.auctionTokenId)
+        let myToken = false
+        if (typeof myToken !== 'undefined') {
+            myToken = true
+        }
+        return {
+            ...bid,
+            myToken,
+        }
+    })
+    return allBidsWithTokenOwner
+}
+
+// gets all bids and adds data about the token bidded on
+// like name, description, icon etc
+// this means some bids will have a different object shape to others
+// depending on if we know this extra data ot not
+async function getAllBidsOwnedWithData(bidContractAddress: string) {
+    const allBids = await getAllBidsWithTokenOwner(bidContractAddress)
+    const allKnownTokens = await getAllKnownTokens()
+    const allBidsUpdated = allBids.map((bid) => {
+        const bidTokenKnown = allKnownTokens.find((token) => token.tokenid === bid.auctionTokenId)
+        if (typeof bidTokenKnown === 'undefined') {
+            return { ...bid }
+        } else {
+            return {
+                ...bid,
+                ...bidTokenKnown,
+            }
+        }
+    })
+    return allBidsUpdated
 }
 
 //////////////// Seller /////////////////////////////////////////
@@ -285,7 +369,7 @@ function getCoinId(zTokenId: string) {
 }
 
 function selectBid(acceptedBidIndex: number, bidder_script_accress: string, publicKey: string) {
-    listAllBids(bidder_script_accress).then((bids: any) => {
+    listAllBids(bidder_script_accress, false).then((bids: any) => {
         const selectedBid = bids[acceptedBidIndex]
         newAddress().then((myNewAddress: string) => {
             acceptBid(
@@ -388,6 +472,22 @@ function getCoinsFromAddress(address: string) {
         Minima.cmd(command, (res) => {
             if (res.status && res.response && res.response.coins) {
                 resolve(res.response.coins)
+            } else {
+                reject(res)
+            }
+        })
+    })
+}
+
+// get all my tokens
+// sendable or locked up
+function getAllMyTokens(): Promise<Token[]> {
+    return new Promise((resolve, reject) => {
+        const command = 'balance'
+        Minima.cmd(command, (res) => {
+            if (res.status && res.response && res.response.balance) {
+                const nfts: Token[] = res.response.balance
+                resolve(nfts)
             } else {
                 reject(res)
             }
@@ -510,14 +610,12 @@ function seeAuctionsWithNameAndImage() {}
 
 const Minima_Service = {
     initializeMinima,
-    createAuctionContract,
-    createBidContract,
     newAddress,
     newKey,
-    getAllYourAddresses,
-    getAllYourPublicKeys,
+    createAuctionContract,
+    createBidContract,
     getAllAuctionsWithData,
-    listAllBids,
+    getAllBidsOwnedWithData,
     getAllMyNFTs,
     createAuction,
     createBidTransaction,
