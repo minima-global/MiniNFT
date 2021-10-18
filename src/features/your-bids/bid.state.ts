@@ -1,6 +1,7 @@
 import { createAsyncThunk, createAction, createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit'
 import Minima_Service from './../../minima.service'
 import { RootState, AppThunk } from './../../app/store'
+import BidToken from './Bid'
 
 export const listBidsMade = (): AppThunk => (dispatch, getState) => {
     const state = getState()
@@ -14,6 +15,15 @@ export const listBidsMade = (): AppThunk => (dispatch, getState) => {
         dispatch(bidActions.storeBids(res))
     })
 }
+
+export const acceptBid =
+    (bid: BidToken): AppThunk =>
+    (dispatch, getState) => {
+        const state = getState()
+        const myAddress = state.appInit.walletAddress
+        const myKey = state.appInit.publicKey
+        Minima_Service.acceptThisBid(bid, myAddress, myKey)
+    }
 
 export interface BidsState {
     bids: any[]
@@ -38,6 +48,8 @@ const bidActions = bidSlice.actions
 const bidReducer = bidSlice.reducer
 
 export default bidReducer
+
+// Custom actions
 
 // selectors
 const selectBids = (state: RootState): BidsState => {

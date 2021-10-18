@@ -1,4 +1,5 @@
 import { Minima, NetworkStatus, Address, Coin, Token } from 'minima'
+import BidToken from './features/your-bids/Bid'
 
 // Everything minima related in this app should do through this service
 // Not calling minima library directly
@@ -258,13 +259,14 @@ async function getAllBidsYouHaveMade(bidContractAddress: string) {
 }
 
 // gets all bids
-// with a flag added that tells you if its your NFT token
+// with a flag added that tells you if its YOUR NFT token
+// owner = true/false
 async function getAllBidsWithTokenOwner(bidContractAddress: string) {
     const [allBids, allMyTokens] = await Promise.all([getAllBidsYouHaveMade(bidContractAddress), getAllMyTokens()])
     const allBidsWithTokenOwner = allBids.map((bid) => {
         const foundBidForYourToken = allMyTokens.find((myToken) => myToken.tokenid === bid.auctionTokenId)
         let myToken = false
-        if (typeof myToken !== 'undefined') {
+        if (typeof foundBidForYourToken !== 'undefined') {
             myToken = true
         }
         return {
@@ -383,6 +385,10 @@ function selectBid(acceptedBidIndex: number, bidder_script_accress: string, publ
             )
         })
     })
+}
+
+function acceptThisBid(selectedBid: BidToken, myAddress: string, myKey: string) {
+    acceptBid(selectedBid.auctionTokenId, myAddress, selectedBid.coin, selectedBid.bidderAddress, 2, 44, myKey)
 }
 
 // The Host accepts bid of bidder
@@ -619,6 +625,7 @@ const Minima_Service = {
     getAllMyNFTs,
     createAuction,
     createBidTransaction,
+    acceptThisBid,
 }
 
 export default Minima_Service

@@ -4,16 +4,16 @@ import BidsReceived from './BidsReceived'
 import BidsNothingToDoWithYou from './BidsNothingToDoWithYou'
 import { useAppDispatch, useAppSelector } from './../../app/hooks'
 import { listBidsMade, selectAllBids } from './bid.state'
-import Bid from './Bid'
+import BidToken from './Bid'
 
 const YourBids = () => {
-    const dispatch = useAppDispatch
-    const bids: Bid[] = useAppSelector(selectAllBids)
+    const dispatch = useAppDispatch()
+    const bids: BidToken[] = useAppSelector(selectAllBids)
     console.log(bids)
 
-    const bidsMade: Bid[] = []
-    const bidsRecieved: Bid[] = []
-    const bidsNotMine: Bid[] = []
+    const bidsMade: BidToken[] = []
+    const bidsRecieved: BidToken[] = []
+    const bidsNotMine: BidToken[] = []
 
     useEffect(() => {
         dispatch(listBidsMade())
