@@ -31,7 +31,7 @@ const NavigationBar: React.FC = (props: any) => {
                         <IconButton edge="start" color="inherit" aria-label="menu" onClick={toggleDrawer(true)}>
                             <MenuIcon />
                         </IconButton>
-                        <Typography variant="h6">Nice Fucking Tits</Typography>
+                        <Typography variant="h6">Nice Fucking Token</Typography>
                     </Toolbar>
                 </AppBar>
             </div>

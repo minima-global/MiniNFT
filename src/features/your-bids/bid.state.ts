@@ -11,7 +11,6 @@ export const listBidsMade = (): AppThunk => (dispatch, getState) => {
         return
     }
     Minima_Service.getAllBidsOwnedWithData(bidAddress).then((res: any) => {
-        console.log(res)
         dispatch(bidActions.storeBids(res))
     })
 }

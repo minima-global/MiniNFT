@@ -14,6 +14,11 @@
     1. You created the auction with that bid in it, or (yourAuctions n bids on tokenId)
     2. You did not create the bid, or the auction its on (nothing to do with you)
 
+# Tasks
+
+1. publicKey is used to create the auction. The same public key will be needed to accept the bid. If you restart the app between these two events, you will loose the public key from memory and not be able to do anything. Need to find a solution
+2.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
 
 ## Available Scripts

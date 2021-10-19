@@ -150,6 +150,7 @@ async function getAllAuctions(auctionContractAddress: string) {
         listAllAuctions(auctionContractAddress, false),
         listAllAuctions(auctionContractAddress, true),
     ])
+
     const allAuctionsUpdated = allAuctions.map((auction) => {
         const foundOwn = ownAuctions.find((ownAuction) => auction.coin === ownAuction.coin)
         let own = true
@@ -188,6 +189,7 @@ async function getAllAuctionsWithData(auctionContractAddress: string) {
 
 // list all the NFTs (coinid and tokenid), listed in the auction
 function listAllAuctions(auctionContractAddress: string, justMine: boolean): Promise<any[]> {
+    listAllAuctionsTxPow(auctionContractAddress)
     return new Promise((resolve, reject) => {
         let command = 'coins address:' + auctionContractAddress
         if (justMine) {
@@ -207,6 +209,43 @@ function listAllAuctions(auctionContractAddress: string, justMine: boolean): Pro
             }
         })
     })
+}
+
+// Uses txpowsearch command to get tokens in auction contract
+function listAllAuctionsTxPow(auctionContractAddress: string): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+        const command = `txpowsearch output:${auctionContractAddress}`
+        Minima.cmd(command, (res) => {
+            const tokens = res.response.txpowlist.map((aTxPow: any) => {
+                return aTxPow.txpow.body.witness.tokens[0]
+            })
+            resolve(tokens)
+        })
+    })
+}
+
+// compare the tokenIds returned from txpowsearch and coin commands
+async function compareTokenLists(auctionContractAddress: string) {
+    const txpowTokens = await listAllAuctionsTxPow(auctionContractAddress)
+    const coinTokens = await listAllAuctions(auctionContractAddress, false)
+    const txPowTokenIds = txpowTokens.map((t) => t.tokenid)
+    const coinTokenIds = coinTokens.map((t) => t.tokenid)
+
+    const comparison: any = {
+        allTxPowTokens: txPowTokenIds,
+        allCoinTokens: coinTokenIds,
+        compare: {
+            bothLists: [],
+            onlyTxPow: [],
+            onlyCoin: [],
+        },
+    }
+
+    comparison.compare.bothLists = txPowTokenIds.filter((id) => coinTokenIds.includes(id))
+    comparison.compare.onlyTxPow = txPowTokenIds.filter((id) => !coinTokenIds.includes(id))
+    comparison.compare.onlyCoin = coinTokenIds.filter((id) => !txPowTokenIds.includes(id))
+
+    return comparison
 }
 
 // list all the bids (coinid and tokenid), listed in the bid contract
@@ -626,6 +665,7 @@ const Minima_Service = {
     createAuction,
     createBidTransaction,
     acceptThisBid,
+    compareTokenLists,
 }
 
 export default Minima_Service

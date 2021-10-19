@@ -7,7 +7,6 @@ interface IProps {
 }
 
 const BidsNothingToDoWithYou = ({ bids }: IProps) => {
-    console.log('bids not mine', bids)
     return (
         <>
             <h2>Bids Nothin To Do With You</h2>

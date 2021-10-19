@@ -9,7 +9,6 @@ import BidToken from './Bid'
 const YourBids = () => {
     const dispatch = useAppDispatch()
     const bids: BidToken[] = useAppSelector(selectAllBids)
-    console.log(bids)
 
     const bidsMade: BidToken[] = []
     const bidsRecieved: BidToken[] = []
@@ -30,10 +29,6 @@ const YourBids = () => {
             }
         }
     })
-
-    console.log('bidsMade', bidsMade)
-    console.log('bidsRecieved', bidsRecieved)
-    console.log('bidsNotMine', bidsNotMine)
 
     const bidsMadeProps = {
         bids: bidsMade,

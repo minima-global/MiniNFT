@@ -25,8 +25,8 @@ const AuctionSummaryCard = ({ auction }: IProps) => {
                     <Typography variant="h5">
                         {auction.token ? <div>{auction.token}</div> : <div>Token not found</div>}
                     </Typography>
-                    <Typography>{auction.coin}</Typography>
-                    <Typography>{auction.tokenid}</Typography>
+                    <Typography>coinId: {auction.coin}</Typography>
+                    <Typography>tokenId: {auction.tokenid}</Typography>
                     {auction.own ? null : <Button onClick={bidOnAuctionClicked}>Bid 2 Minima</Button>}
                 </CardContent>
             </Card>

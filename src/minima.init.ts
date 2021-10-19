@@ -5,6 +5,7 @@ import { generateWalletAddress, generatePublicKey, createContracts } from './app
 import { listAuctions } from './features/marketplace/marketplace.state'
 import { listBidsMade } from './features/your-bids/bid.state'
 import { fetchNfts } from './features/nft-wallet/nftwallet.state'
+import { compareAuctionTokenLists } from './debug.state'
 
 export interface InitState {
     connected: boolean
@@ -68,6 +69,7 @@ export const minimaInit = (): AppThunk => (dispatch, getState) => {
                 dispatch(listAuctions())
                 dispatch(listBidsMade())
                 dispatch(fetchNfts())
+                dispatch(compareAuctionTokenLists())
                 // TODO: dispatch(getBidsOnAllAuctions())
                 break
             case MinimaEventTypes.NEWTRANSACTION:
