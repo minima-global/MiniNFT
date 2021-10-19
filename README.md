@@ -17,7 +17,7 @@
 # Tasks
 
 1. publicKey is used to create the auction. The same public key will be needed to accept the bid. If you restart the app between these two events, you will loose the public key from memory and not be able to do anything. Need to find a solution
-2.
+2. java -jar minima/Minima/jar/minima.jar -port 8000 -cleanhard -conf minimaconf2. This restarts a node from scratch. Tokns command will have no tokens. coins command can see all the coinId and tokenId in the auction contract, but not details (NFT name, description, icon etc)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
 

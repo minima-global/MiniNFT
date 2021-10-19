@@ -13,7 +13,7 @@ const Marketplace = () => {
 
     return (
         <>
-            <h1>List all auctions</h1>
+            <h1>List all auctions ({auctions.length})</h1>
             {auctions.map((auction, i) => (
                 <AuctionSummaryCard auction={auction}></AuctionSummaryCard>
             ))}
