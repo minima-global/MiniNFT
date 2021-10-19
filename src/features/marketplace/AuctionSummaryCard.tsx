@@ -1,34 +1,35 @@
 import React from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import { bidOnAuction } from './marketplace.state'
+import AuctionToken from './Auction'
 
-const AuctionSummaryCard = (props: any) => {
+interface IProps {
+    auction: AuctionToken
+}
+
+const AuctionSummaryCard = ({ auction }: IProps) => {
     const dispatch = useAppDispatch()
-    console.log(props)
 
-    // TODO: create function on button click
-    // dispatches bid event with auction as argument
-    // TODO: create auction type
-    function bidOnAuctionClicked(auction: any) {
-        return () => {
-            dispatch(bidOnAuction(auction))
-        }
+    function bidOnAuctionClicked() {
+        dispatch(bidOnAuction(auction))
     }
 
     return (
         <>
-            <div>{props.auction.token}</div>
-            <div>{props.auction.tokenid}</div>
-            <div>{props.auction.description}</div>
-            <div>{props.auction.icon}</div>
-            <div>
-                {props.auction.own ? null : (
-                    <Button onClick={bidOnAuctionClicked(props.auction)} variant="text">
-                        Bid 2 Minima
-                    </Button>
-                )}
-            </div>
+            <Card>
+                <CardContent>
+                    <Typography variant="h5">
+                        {auction.token ? <div>{auction.token}</div> : <div>Token not found</div>}
+                    </Typography>
+                    <Typography>{auction.coin}</Typography>
+                    <Typography>{auction.tokenid}</Typography>
+                    {auction.own ? null : <Button onClick={bidOnAuctionClicked}>Bid 2 Minima</Button>}
+                </CardContent>
+            </Card>
         </>
     )
 }
