@@ -9,27 +9,27 @@ const Routes = [
     {
         path: '/',
         sidebarName: 'Marketplace',
-        component: Marketplace,
+        element: <Marketplace></Marketplace>,
     },
     {
         path: '/create',
         sidebarName: 'Mint/Create NFT',
-        component: MintNft,
+        element: <MintNft></MintNft>,
     },
     {
         path: '/wallet',
         sidebarName: 'NFT Wallet',
-        component: NftWallet,
+        element: <NftWallet></NftWallet>,
     },
     {
         path: '/myauctions',
         sidebarName: 'Your Auctions',
-        component: YourAuctions,
+        element: <YourAuctions></YourAuctions>,
     },
     {
         path: '/mybids',
         sidebarName: 'Your Bids',
-        component: YourBids,
+        element: <YourBids></YourBids>,
     },
 ]
 

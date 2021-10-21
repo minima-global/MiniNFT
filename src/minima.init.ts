@@ -1,4 +1,4 @@
-import { createAsyncThunk, createAction, createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createAction, createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit'
 import Minima_Service from './minima.service'
 import { RootState, AppThunk } from './app/store'
 import { generateWalletAddress, generatePublicKey, createContracts } from './appInit.slice'
@@ -10,11 +10,13 @@ import { compareAuctionTokenLists } from './debug.state'
 export interface InitState {
     connected: boolean
     latestMessage: string
+    blockNumber: number
 }
 
 const initialState: InitState = {
     connected: false,
     latestMessage: '',
+    blockNumber: 0,
 }
 
 const enum MinimaEventTypes {
@@ -29,6 +31,16 @@ const enum MinimaEventTypes {
     MINIMGSTART = 'miningstart',
     MININGSTOP = 'miningstop',
 }
+
+export const newBlock = createAction<any>('minima_event/new_block')
+export const newTransaction = createAction<any>('minima_event/new_transaction')
+export const newTxPow = createAction<any>('minima_event/new_txpow')
+export const newBalance = createAction<any>('minima_event/new_balance')
+export const network = createAction<any>('minima_event/network')
+export const txPowStart = createAction<any>('minima_event/tx_pow_start')
+export const txPowEnd = createAction<any>('minima_event/tx_pow_end')
+export const miningstart = createAction<any>('minima_event/mining_start')
+export const miningstop = createAction<any>('minima_event/mining_stop')
 
 export const initSlice = createSlice({
     name: 'init',
@@ -45,6 +57,11 @@ export const initSlice = createSlice({
         chainMessage: (state, action) => {
             state.latestMessage = action.payload
         },
+    },
+    extraReducers: (builder) => {
+        builder.addCase(newBlock, (state, action: any) => {
+            state.blockNumber = parseInt(action.payload.txpow.header.block)
+        })
     },
 })
 
@@ -104,12 +121,9 @@ export const minimaInit = (): AppThunk => (dispatch, getState) => {
     })
 }
 
-export const newBlock = createAction<any>('minima_event/new_block')
-export const newTransaction = createAction<any>('minima_event/new_transaction')
-export const newTxPow = createAction<any>('minima_event/new_txpow')
-export const newBalance = createAction<any>('minima_event/new_balance')
-export const network = createAction<any>('minima_event/network')
-export const txPowStart = createAction<any>('minima_event/tx_pow_start')
-export const txPowEnd = createAction<any>('minima_event/tx_pow_end')
-export const miningstart = createAction<any>('minima_event/mining_start')
-export const miningstop = createAction<any>('minima_event/mining_stop')
+// Selectors
+
+const selectInit = (state: RootState): InitState => {
+    return state.init
+}
+export const selectBlockNumber = createSelector(selectInit, (init: InitState) => init.blockNumber)

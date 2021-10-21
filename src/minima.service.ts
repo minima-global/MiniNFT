@@ -568,7 +568,7 @@ function isCoinNFTAndSendable(coin: Token) {
  * Creates an NFT with the given name,
  * or a random name if none is given
  */
-function createNFT(nameStr: string) {
+function createNFT(nameStr?: string) {
     return new Promise((resolve, reject) => {
         let nftName = (Math.random() + 1).toString(36).substring(7)
         nftName = 'NFT-' + nftName
@@ -593,7 +593,7 @@ function createNFT(nameStr: string) {
     })
 }
 
-function createNFTWithImage(nameStr: string, encodedImage: string) {
+function createNFTWithImage(encodedImage: string, nameStr?: string) {
     return new Promise((resolve, reject) => {
         let nftName = (Math.random() + 1).toString(36).substring(7)
         nftName = 'NFT-' + nftName
@@ -641,17 +641,84 @@ function createBidTransaction(
     })
 }
 
-// Bidder cancels his bid if blkDiff gte 100 and signed by bidder
-function cancelMyBid() {}
+/////////// Art Work /////////////////////////
 
-function getCurrentHighestBid(auction: string) {}
+function buildNFT(nameStr?: string) {
+    return getResizedImage(0.2).then((encoded) => {
+        console.log('NFT image string', encoded)
+        const onlyString = encoded.slice(encoded.indexOf(',') + 1)
+        createNFTWithImage(onlyString, nameStr).then(console.log, console.error)
+    }, console.error)
+}
 
-function getTimeLeftOnAuction(auction: string) {}
+function getResizedImage(compressionFactor: number) {
+    // Read the files using the HTML5 FileReader API with .readAsArrayBuffer
 
-function getAuctionByNFTTokenName() {}
+    // Create a Blob with the file data and get its url with window.URL.createObjectURL(blob)
 
-// list all auctions by name and image
-function seeAuctionsWithNameAndImage() {}
+    // Create new Image element and set it's src to the file blob url
+
+    // Send the image to the canvas. The canvas size is set to desired output size
+
+    // Get the scaled-down data back from canvas via canvas.toDataURL("image/jpeg",0.7) (set your own output format and quality)
+
+    // Attach new hidden inputs to the original form and transfer the dataURI images basically as normal text
+
+    // On backend, read the dataURI, decode from Base64, and save it
+
+    return getArtDataUrl().then((imageUrl: string) => {
+        let imageNode = document.createElement('img')
+        imageNode.src = imageUrl
+        // let canvas: any = document.getElementById('canvas')
+        // const div = document.getElementById('imageDiv')
+        // div.appendChild(imageNode)
+        // console.log('load and display image with javascript')
+
+        let canvas: any = document.createElement('canvas')
+
+        let width = imageNode.width
+        let height = imageNode.height
+
+        var ctx = canvas.getContext('2d')
+        ctx.drawImage(imageNode, 0, 0, 300, 150)
+
+        // ctx.fillStyle = 'green';
+        // ctx.fillRect(10, 10, 150, 100);
+
+        const url = canvas.toDataURL('image/jpeg', compressionFactor) // get the data from canvas as 70% JPG (can be also PNG, etc.)
+        canvas = null // or some way to destroy the element
+
+        return url
+    }, console.error)
+}
+
+function getArtDataUrl(): Promise<any> {
+    return new Promise((resolve, reject) => {
+        getArt().then((imageBlob) => {
+            var reader = new FileReader()
+
+            reader.onload = function () {
+                console.log(reader.result)
+                resolve(reader.result)
+            }
+
+            reader.readAsDataURL(imageBlob)
+        })
+    })
+}
+
+// Build url like so
+// '/minidapps/0x97E1C726F39DDAFE82599F1A3864DE35A4EC3FA6/NFT-non-fungible-token.2-810x524.jpg'
+function getArt() {
+    const origin = window.location.origin + '/'
+    const fileName = 'NFT-non-fungible-token.2-810x524.jpg'
+    const indexPath = window.location.pathname
+    const minidapps = indexPath.split('/')[1]
+    const appId = indexPath.split('/')[2]
+    const basePath = `${minidapps}/${appId}/`
+
+    return fetch(origin + basePath + fileName).then((response) => response.blob())
+}
 
 const Minima_Service = {
     initializeMinima,
@@ -666,6 +733,8 @@ const Minima_Service = {
     createBidTransaction,
     acceptThisBid,
     compareTokenLists,
+    buildNFT, // with image
+    createNFT, // without image
 }
 
 export default Minima_Service
