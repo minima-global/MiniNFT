@@ -6,6 +6,7 @@ import { listAuctions } from './features/marketplace/marketplace.state'
 import { listBidsMade } from './features/your-bids/bid.state'
 import { fetchNfts } from './features/nft-wallet/nftwallet.state'
 import { compareAuctionTokenLists } from './debug.state'
+import { enqueueSnackbar } from './layout/notifications.state'
 
 export interface InitState {
     connected: boolean
@@ -70,6 +71,14 @@ const { actions, reducer } = initSlice
 export const { initSuccess, chainMessage } = actions
 export default reducer
 
+const minimaLoadedSuccess = {
+    message: 'Minima Loaded',
+    options: {
+        key: new Date().getTime() + Math.random(),
+        variant: 'success',
+    },
+}
+
 // We can also write thunks by hand, which may contain both sync and async logic.
 // Here's an example of conditionally dispatching actions based on current state.
 export const minimaInit = (): AppThunk => (dispatch, getState) => {
@@ -80,6 +89,7 @@ export const minimaInit = (): AppThunk => (dispatch, getState) => {
                 dispatch(createContracts())
                 dispatch(generateWalletAddress())
                 dispatch(generatePublicKey())
+                dispatch(enqueueSnackbar(minimaLoadedSuccess))
                 break
             case MinimaEventTypes.NEWBLOCK:
                 dispatch(newBlock(msg.info))

@@ -18,6 +18,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 
 import { useAppSelector } from './../app/hooks'
 import { selectBlockNumber } from './../minima.init'
+import Notifications from './Notifications'
 
 const NavigationBar: React.FC = (props: any) => {
     const blockNumber = useAppSelector(selectBlockNumber)
@@ -77,6 +78,7 @@ const NavigationBar: React.FC = (props: any) => {
                 </div>
             </Drawer>
             <Outlet></Outlet>
+            <Notifications></Notifications>
         </div>
     )
 }

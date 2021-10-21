@@ -1,10 +1,19 @@
 import { createAsyncThunk, createAction, createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit'
 import Minima_Service, { Token } from './../../minima.service'
 import { RootState, AppThunk } from './../../app/store'
+import { enqueueSnackbar } from './../../layout/notifications.state'
 
 export const fetchNfts = createAsyncThunk('nftwallet/fetchNfts', async () => {
     return Minima_Service.getAllMyNFTs()
 })
+
+const auctionCreatedSuccess = {
+    message: 'Auction Created',
+    options: {
+        key: new Date().getTime() + Math.random(),
+        variant: 'success',
+    },
+}
 
 export const sendNftToAuction =
     (nft: any): AppThunk =>
@@ -13,8 +22,7 @@ export const sendNftToAuction =
         const myTokenId = nft.tokenid
         const publicKey = getState().appInit.publicKey
         Minima_Service.createAuction(auctionScriptAddress, myTokenId, publicKey).then((res) => {
-            // dispatch success action
-            console.log('auciton created', res)
+            dispatch(enqueueSnackbar(auctionCreatedSuccess))
         })
     }
 

@@ -7,6 +7,7 @@ import nftWalletReducer from './../features/nft-wallet/nftwallet.state'
 import bidReducer from './../features/your-bids/bid.state'
 import debugReducer from './../debug.state'
 import mintNFTReducer from './../features/mint-nft/mintNft.state'
+import notificationsReducer from './../layout/notifications.state'
 
 export const store = configureStore({
     reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
         bids: bidReducer,
         debug: debugReducer,
         mintNFTs: mintNFTReducer,
+        notifications: notificationsReducer,
     },
 })
 
