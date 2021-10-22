@@ -18,6 +18,26 @@ const AuctionSummaryCard = ({ auction }: IProps) => {
         dispatch(bidOnAuction(auction))
     }
 
+    const imageField: any = auction.description
+    let imageUrl = null // populate with image if we have one, or keep null if we don't
+
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=1554068
+    // Firefox users still see error in console even if we catch it
+    try {
+        var parser = new DOMParser()
+        const doc = parser.parseFromString(imageField, 'application/xml')
+        const errorNode2 = doc.querySelector('parsererror')
+        if (errorNode2) {
+            console.log('Token does not contain an image: ' + auction.token)
+        } else {
+            console.log('parsing succeeded')
+            var imageString = doc.getElementsByTagName('artimage')[0].innerHTML
+            imageUrl = `data:image/jpeg;base64,${imageString}`
+        }
+    } catch (err) {
+        console.error('Token does not contain an image: ' + auction.token)
+    }
+
     return (
         <>
             <Card>
@@ -28,6 +48,7 @@ const AuctionSummaryCard = ({ auction }: IProps) => {
                     <Typography>coinId: {auction.coin}</Typography>
                     <Typography>tokenId: {auction.tokenid}</Typography>
                     {auction.own ? null : <Button onClick={bidOnAuctionClicked}>Bid 2 Minima</Button>}
+                    {imageUrl ? <img src={imageUrl} width="300" height="200"></img> : null}
                 </CardContent>
             </Card>
         </>

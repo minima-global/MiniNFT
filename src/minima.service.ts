@@ -600,8 +600,17 @@ function createNFTWithImage(encodedImage: string, nameStr?: string) {
         if (typeof nameStr !== 'undefined') {
             nftName = nameStr
         }
-        const encodedImageJSON = JSON.stringify({ artImage: encodedImage })
-        const command = `tokencreate name:${nftName} amount:1.0 description:${encodedImageJSON}`
+        // const encodedImageJSON = JSON.stringify({ artImage: encodedImage })
+
+        var xmlString = '<artimage></artimage>'
+        var parser = new DOMParser()
+        var xmlDoc: any = parser.parseFromString(xmlString, 'text/xml')
+        xmlDoc.firstElementChild.innerHTML = encodedImage
+        var serializer = new XMLSerializer()
+        var imageXmlString = serializer.serializeToString(xmlDoc)
+
+        const command = `tokencreate name:${nftName} amount:1.0 description:${imageXmlString}`
+
         Minima.cmd(command, (res) => {
             if (
                 res.status &&
