@@ -350,7 +350,11 @@ function createAuction(auctionScriptAddress: string, myTokenId: string, publicKe
     return new Promise((resolve, reject) => {
         let command = `send 1 ${auctionScriptAddress} ${myTokenId} 23:${publicKey}`
         Minima.cmd(command, (res) => {
-            resolve(res)
+            if (res.status) {
+                resolve(res.message)
+            } else {
+                reject(res.message)
+            }
         })
     })
 }
@@ -427,11 +431,11 @@ function selectBid(acceptedBidIndex: number, bidder_script_accress: string, publ
 }
 
 function acceptThisBid(selectedBid: BidToken, myAddress: string, myKey: string) {
-    acceptBid(selectedBid.auctionTokenId, myAddress, selectedBid.coin, selectedBid.bidderAddress, 2, 44, myKey)
+    return acceptBid(selectedBid.auctionTokenId, myAddress, selectedBid.coin, selectedBid.bidderAddress, 2, 44, myKey)
 }
 
 // The Host accepts bid of bidder
-async function acceptBid(
+function acceptBid(
     nftTokenId: string,
     sellerAddress: string,
     minimaBidCoinId: string,
@@ -440,22 +444,39 @@ async function acceptBid(
     scale: number,
     publicKey: string
 ) {
-    let minimaAmountNFT = 1 / Math.pow(10, scale)
-    let minimaTokenId = '0x00'
-    const nftCoinId = await getCoinId(nftTokenId)
-    // const bidContractCoinId = await getCoinIdFromBidContract(bidContract, buyerAddress)
+    return new Promise((resolve, reject) => {
+        let minimaAmountNFT = 1 / Math.pow(10, scale)
+        let minimaTokenId = '0x00'
+        getCoinId(nftTokenId).then((nftCoinId) => {
+            // const bidContractCoinId = await getCoinIdFromBidContract(bidContract, buyerAddress)
 
-    // 1st input is the bid contract (Minima).. 1st output is the NFT sent to the bidder
-    // 2nd input is the NFT token..  2nd output is the Minima sent to the seller
-    let command = `txncreate 10;
-        txninput 10 ${minimaBidCoinId};
-        txninput 10 ${nftCoinId};
-        txnoutput 10 ${minimaAmountNFT} ${buyerAddress} ${nftTokenId};
-        txnoutput 10 ${minimaAmountBid} ${sellerAddress} ${minimaTokenId};
-        txnsign 10 ${publicKey};
-        txnpost 10;
-        txndelete 10`
-    Minima.cmd(command, console.log)
+            // 1st input is the bid contract (Minima).. 1st output is the NFT sent to the bidder
+            // 2nd input is the NFT token..  2nd output is the Minima sent to the seller
+            let command = `txncreate 10;
+                txninput 10 ${minimaBidCoinId};
+                txninput 10 ${nftCoinId};
+                txnoutput 10 ${minimaAmountNFT} ${buyerAddress} ${nftTokenId};
+                txnoutput 10 ${minimaAmountBid} ${sellerAddress} ${minimaTokenId};
+                txnsign 10 ${publicKey};
+                txnpost 10;
+                txndelete 10`
+            Minima.cmd(command, (responsesArray) => {
+                console.log(responsesArray)
+                // res is an array of responses for each txninput
+                // find the one with txn post
+                const txnPost = responsesArray.find((res: any) => res.minifunc && res.minifunc === 'txnpost 10')
+                if (typeof txnPost === 'undefined') {
+                    reject('Error: No txnpost found')
+                } else {
+                    if (txnPost.status && txnPost.message === 'Send Success') {
+                        resolve(txnPost.message)
+                    } else {
+                        reject(txnPost.message)
+                    }
+                }
+            })
+        })
+    })
 }
 
 // VERIFYOUT ( NUMBER HEX NUMBER HEX )
@@ -642,9 +663,9 @@ function createBidTransaction(
         const sendTransaction = `send ${amount} ${scriptAddress} ${minimaTokenId} 0:${myPubKey}#1:${myAddress}#2:${tokenIdIWant}`
         Minima.cmd(sendTransaction, (res) => {
             if (res.status && res.message === 'Send Success') {
-                resolve(res)
+                resolve(res.message)
             } else {
-                reject(res)
+                reject(res.message)
             }
         })
     })
@@ -656,7 +677,7 @@ function buildNFT(nameStr?: string) {
     return getResizedImage(0.2).then((encoded) => {
         console.log('NFT image string', encoded)
         const onlyString = encoded.slice(encoded.indexOf(',') + 1)
-        createNFTWithImage(onlyString, nameStr).then(console.log, console.error)
+        return createNFTWithImage(onlyString, nameStr).then(console.log, console.error)
     }, console.error)
 }
 

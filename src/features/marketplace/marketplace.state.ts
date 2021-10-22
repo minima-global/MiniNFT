@@ -1,6 +1,7 @@
 import { createAsyncThunk, createAction, createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit'
 import Minima_Service from './../../minima.service'
 import { RootState, AppThunk } from './../../app/store'
+import { enqueueSnackbar } from './../../layout/notifications.state'
 
 export const listAuctions = (): AppThunk => (dispatch, getState) => {
     const auctionAddress = getState().appInit.auctionContractAddress
@@ -13,7 +14,6 @@ export const listAuctions = (): AppThunk => (dispatch, getState) => {
     })
 }
 
-// TODO: create auction type
 export const bidOnAuction =
     (auction: any): AppThunk =>
     (dispatch, getState) => {
@@ -25,11 +25,28 @@ export const bidOnAuction =
             console.error(`async error, bid address, key, or wallet is still '' when you read it`) // TODO: notification or action here
             return
         }
-        Minima_Service.createBidTransaction(2, bidAddress, myAddress, myKey, auction.tokenid).then((res: any) => {
-            console.log(res)
-            // TODO: dispatch soe sort of successful notification
-            // new block event will read any new bids and populate them
-        })
+        Minima_Service.createBidTransaction(2, bidAddress, myAddress, myKey, auction.tokenid).then(
+            (msg) => {
+                const bidCreatedSuccess = {
+                    message: 'Bid Created, ' + msg,
+                    options: {
+                        key: new Date().getTime() + Math.random(),
+                        variant: 'success',
+                    },
+                }
+                dispatch(enqueueSnackbar(bidCreatedSuccess))
+            },
+            (msg) => {
+                const bidCreatedFailure = {
+                    message: 'Bid Failure, ' + msg,
+                    options: {
+                        key: new Date().getTime() + Math.random(),
+                        variant: 'error',
+                    },
+                }
+                dispatch(enqueueSnackbar(bidCreatedFailure))
+            }
+        )
     }
 
 export interface MarketplaceState {

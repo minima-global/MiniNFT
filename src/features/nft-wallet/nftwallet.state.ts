@@ -7,23 +7,34 @@ export const fetchNfts = createAsyncThunk('nftwallet/fetchNfts', async () => {
     return Minima_Service.getAllMyNFTs()
 })
 
-const auctionCreatedSuccess = {
-    message: 'Auction Created',
-    options: {
-        key: new Date().getTime() + Math.random(),
-        variant: 'success',
-    },
-}
-
 export const sendNftToAuction =
     (nft: any): AppThunk =>
     (dispatch, getState) => {
         const auctionScriptAddress = getState().appInit.auctionContractAddress
         const myTokenId = nft.tokenid
         const publicKey = getState().appInit.publicKey
-        Minima_Service.createAuction(auctionScriptAddress, myTokenId, publicKey).then((res) => {
-            dispatch(enqueueSnackbar(auctionCreatedSuccess))
-        })
+        Minima_Service.createAuction(auctionScriptAddress, myTokenId, publicKey).then(
+            (msg) => {
+                const auctionCreatedSuccess = {
+                    message: 'Auction Created, ' + msg,
+                    options: {
+                        key: new Date().getTime() + Math.random(),
+                        variant: 'success',
+                    },
+                }
+                dispatch(enqueueSnackbar(auctionCreatedSuccess))
+            },
+            (msg) => {
+                const auctionCreatedFailure = {
+                    message: 'Auction Failure, ' + msg,
+                    options: {
+                        key: new Date().getTime() + Math.random(),
+                        variant: 'error',
+                    },
+                }
+                dispatch(enqueueSnackbar(auctionCreatedFailure))
+            }
+        )
     }
 
 export interface NftWalletState {

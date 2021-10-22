@@ -2,6 +2,7 @@ import { createAsyncThunk, createAction, createSlice, PayloadAction, createSelec
 import Minima_Service from './../../minima.service'
 import { RootState, AppThunk } from './../../app/store'
 import BidToken from './Bid'
+import { enqueueSnackbar } from './../../layout/notifications.state'
 
 export const listBidsMade = (): AppThunk => (dispatch, getState) => {
     const state = getState()
@@ -21,7 +22,28 @@ export const acceptBid =
         const state = getState()
         const myAddress = state.appInit.walletAddress
         const myKey = state.appInit.publicKey
-        Minima_Service.acceptThisBid(bid, myAddress, myKey)
+        Minima_Service.acceptThisBid(bid, myAddress, myKey).then(
+            (msg) => {
+                const acceptBidSuccess = {
+                    message: 'Bid Accepted, ' + msg,
+                    options: {
+                        key: new Date().getTime() + Math.random(),
+                        variant: 'success',
+                    },
+                }
+                dispatch(enqueueSnackbar(acceptBidSuccess))
+            },
+            (msg) => {
+                const acceptBidFailure = {
+                    message: 'Bid Accept Failure, ' + msg,
+                    options: {
+                        key: new Date().getTime() + Math.random(),
+                        variant: 'error',
+                    },
+                }
+                dispatch(enqueueSnackbar(acceptBidFailure))
+            }
+        )
     }
 
 export interface BidsState {

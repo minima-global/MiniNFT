@@ -4,6 +4,8 @@ import { useAppDispatch, useAppSelector } from './../app/hooks'
 import { useSnackbar } from 'notistack'
 import { removeSnackbar, selectAllNotifications } from './notifications.state'
 
+// Code based off example from notistack docs https://iamhosseindhv.com/notistack/demos#redux-/-mobx-example
+
 let displayed: any[] = []
 
 const useNotifier = () => {
