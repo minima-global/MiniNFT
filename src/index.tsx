@@ -12,7 +12,7 @@ ReactDOM.render(
             <SnackbarProvider
                 anchorOrigin={{
                     vertical: 'bottom',
-                    horizontal: 'left',
+                    horizontal: 'right',
                 }}
             >
                 <HashRouter>
