@@ -29,11 +29,7 @@ const Notifications = () => {
         closeSnackbar()
     }
 
-    return (
-        <>
-            <Button onClick={handleClick}>Open simple snackbar</Button>
-        </>
-    )
+    return <>{/* <Button onClick={handleClick}>Open simple snackbar</Button> */}</>
 }
 
 export default Notifications

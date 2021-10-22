@@ -44,7 +44,7 @@ const YourBids = () => {
 
     return (
         <>
-            <h1>Your Bids</h1>
+            <h1>List All Bids ({bids.length})</h1>
             <BidsMade {...bidsMadeProps}></BidsMade>
             <BidsReceived {...bidsRecievedProps}></BidsReceived>
             <BidsNothingToDoWithYou {...bidsNotMineProps}></BidsNothingToDoWithYou>

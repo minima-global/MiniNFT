@@ -9,7 +9,7 @@ interface IProps {
 const BidsMade = ({ bids }: IProps) => {
     return (
         <>
-            <h2>Bids You Have Made</h2>
+            <h2>Bids You Have Made ({bids.length})</h2>
             {bids.map((bid, i) => (
                 <BidCard bid={bid} key={i}></BidCard>
             ))}
