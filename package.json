@@ -30,7 +30,7 @@
     },
     "scripts": {
         "start": "react-scripts start",
-        "build": "react-scripts build && zip -r minima-nft.minidapp build",
+        "build": "react-scripts build && zip -r minima-nft_INTERNAL_ONLY.minidapp build",
         "test": "react-scripts test",
         "eject": "react-scripts eject"
     },
