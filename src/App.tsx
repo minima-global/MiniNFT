@@ -7,6 +7,7 @@ import Routes from './Routes'
 import { useAppDispatch } from './app/hooks'
 import { minimaInit } from './minima.init'
 import NavigationBar from './layout/NavigationBar'
+import Container from '@mui/material/Container'
 
 const App = () => {
     const dispatch = useAppDispatch()
@@ -22,7 +23,7 @@ const App = () => {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <NavigationBar />
-            {myRoutes}
+            <Container maxWidth="xl">{myRoutes}</Container>
         </ThemeProvider>
     )
 }

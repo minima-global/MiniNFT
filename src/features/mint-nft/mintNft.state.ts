@@ -2,6 +2,7 @@ import { createAsyncThunk, createAction, createSlice, PayloadAction, createSelec
 import Minima_Service from './../../minima.service'
 import { RootState, AppThunk } from './../../app/store'
 import { enqueueSnackbar } from './../../layout/notifications.state'
+import { Token } from './../../minima.service'
 
 // with image
 // export const createImageNFT = createAsyncThunk('createImageNFT', async () => {
@@ -9,17 +10,60 @@ import { enqueueSnackbar } from './../../layout/notifications.state'
 //     return publicKey
 // })
 
+// Type guard
+function isToken(token: string | Token): token is Token {
+    return (token as Token).token !== undefined
+}
+
+export const createUserImageNFT =
+    (imageDataUrl: string): AppThunk =>
+    (dispatch, getState) => {
+        const COMPRESSION_FACTOR_LOW = 0.1
+        const COMPRESSION_FACTOR_MEDIUM = 0.5
+        const COMPRESSION_FACTOR_HIGH = 0.9
+        Minima_Service.buildUserNFT(imageDataUrl, COMPRESSION_FACTOR_LOW).then(
+            (tkn: string | Token) => {
+                if (isToken(tkn)) {
+                    const userImageNFTCreateSuccess = {
+                        message: 'User Image NFT Created, ' + tkn.token,
+                        options: {
+                            key: new Date().getTime() + Math.random(),
+                            variant: 'success',
+                        },
+                    }
+                    dispatch(enqueueSnackbar(userImageNFTCreateSuccess))
+                } else {
+                    console.error('Error: successful NFT creation should return a token object')
+                }
+            },
+            (msg) => {
+                const userImageNFTCreateFailure = {
+                    message: 'User Image NFT Create Failure, ' + msg,
+                    options: {
+                        key: new Date().getTime() + Math.random(),
+                        variant: 'error',
+                    },
+                }
+                dispatch(enqueueSnackbar(userImageNFTCreateFailure))
+            }
+        )
+    }
+
 export const createImageNFT = (): AppThunk => (dispatch, getState) => {
     Minima_Service.buildNFT().then(
-        (msg) => {
-            const imageNFTCreateSuccess = {
-                message: 'Image NFT Created, ' + msg,
-                options: {
-                    key: new Date().getTime() + Math.random(),
-                    variant: 'success',
-                },
+        (tkn: string | Token) => {
+            if (isToken(tkn)) {
+                const imageNFTCreateSuccess = {
+                    message: 'Image NFT Created, ' + tkn.token,
+                    options: {
+                        key: new Date().getTime() + Math.random(),
+                        variant: 'success',
+                    },
+                }
+                dispatch(enqueueSnackbar(imageNFTCreateSuccess))
+            } else {
+                console.error('Error: successful NFT creation should return a token object')
             }
-            dispatch(enqueueSnackbar(imageNFTCreateSuccess))
         },
         (msg) => {
             const imageNFTCreateFailure = {
