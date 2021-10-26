@@ -201,6 +201,7 @@ function listAllAuctions(auctionContractAddress: string, justMine: boolean): Pro
                     return {
                         coin: c.data.coin.coinid,
                         tokenid: c.data.coin.tokenid,
+                        sellerKey: c.data.prevstate[0].data, // Assuming this is port 23
                     }
                 })
                 resolve(nfts)

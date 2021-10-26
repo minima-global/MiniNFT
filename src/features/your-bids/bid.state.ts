@@ -3,6 +3,7 @@ import Minima_Service from './../../minima.service'
 import { RootState, AppThunk } from './../../app/store'
 import BidToken from './Bid'
 import { enqueueSnackbar } from './../../layout/notifications.state'
+import { selectAllAuctions } from './../marketplace/marketplace.state'
 
 export const listBidsMade = (): AppThunk => (dispatch, getState) => {
     const state = getState()
@@ -21,29 +22,46 @@ export const acceptBid =
     (dispatch, getState) => {
         const state = getState()
         const myAddress = state.appInit.walletAddress
-        const myKey = state.appInit.publicKey
-        Minima_Service.acceptThisBid(bid, myAddress, myKey).then(
-            (msg) => {
-                const acceptBidSuccess = {
-                    message: 'Bid Accepted, ' + msg,
-                    options: {
-                        key: new Date().getTime() + Math.random(),
-                        variant: 'success',
-                    },
+
+        // search auctions for the original public key you used to create it
+        const allAuctions = selectAllAuctions(state)
+        const nftTokenId = bid.auctionTokenId
+        const originalAuction = allAuctions.find((auction) => auction.tokenid === nftTokenId)
+
+        if (typeof originalAuction !== 'undefined') {
+            const originalAuctionKey = originalAuction.sellerKey
+            Minima_Service.acceptThisBid(bid, myAddress, originalAuctionKey).then(
+                (msg) => {
+                    const acceptBidSuccess = {
+                        message: 'Bid Accepted, ' + msg,
+                        options: {
+                            key: new Date().getTime() + Math.random(),
+                            variant: 'success',
+                        },
+                    }
+                    dispatch(enqueueSnackbar(acceptBidSuccess))
+                },
+                (msg) => {
+                    const acceptBidFailure = {
+                        message: 'Bid Accept Failure, ' + msg,
+                        options: {
+                            key: new Date().getTime() + Math.random(),
+                            variant: 'error',
+                        },
+                    }
+                    dispatch(enqueueSnackbar(acceptBidFailure))
                 }
-                dispatch(enqueueSnackbar(acceptBidSuccess))
-            },
-            (msg) => {
-                const acceptBidFailure = {
-                    message: 'Bid Accept Failure, ' + msg,
-                    options: {
-                        key: new Date().getTime() + Math.random(),
-                        variant: 'error',
-                    },
-                }
-                dispatch(enqueueSnackbar(acceptBidFailure))
+            )
+        } else {
+            const originalAuctionSearchFailure = {
+                message: 'Auction search failure: Can not find original auction ' + bid.token,
+                options: {
+                    key: new Date().getTime() + Math.random(),
+                    variant: 'error',
+                },
             }
-        )
+            dispatch(enqueueSnackbar(originalAuctionSearchFailure))
+        }
     }
 
 export interface BidsState {
