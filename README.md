@@ -25,6 +25,7 @@
 4.  1. User 1: Auction a token
     2. User 2: Bid 6 minima on the token
     3. User 1: Accept the bid with an (incorrect) 2 minima amount. Transaction comes back with 'Send Success'. 2 minima and nft is transfered. Not sure what happens with the other 4 minima?
+5. When a seller accepts a bid, the other bids do not automatically get cancelled.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
 
