@@ -12,8 +12,9 @@ import { Token } from './../../minima.service'
 // }
 
 // Bid as stored in the smart contract
-interface RawBid {
+export interface RawBid {
     coin: string
+    amount: number
     auctionTokenId: string
     bidderAddress: string
     bidderPubKey: string

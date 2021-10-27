@@ -15,7 +15,7 @@ export const listAuctions = (): AppThunk => (dispatch, getState) => {
 }
 
 export const bidOnAuction =
-    (auction: any): AppThunk =>
+    (auction: any, bidAmount: number): AppThunk =>
     (dispatch, getState) => {
         const state = getState()
         const bidAddress = state.appInit.bidContractAddress
@@ -25,7 +25,7 @@ export const bidOnAuction =
             console.error(`async error, bid address, key, or wallet is still '' when you read it`) // TODO: notification or action here
             return
         }
-        Minima_Service.createBidTransaction(2, bidAddress, myAddress, myKey, auction.tokenid).then(
+        Minima_Service.createBidTransaction(bidAmount, bidAddress, myAddress, myKey, auction.tokenid).then(
             (msg) => {
                 const bidCreatedSuccess = {
                     message: 'Bid Created, ' + msg,

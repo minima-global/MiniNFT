@@ -263,6 +263,7 @@ function listAllBids(bidsContractAddress: string, justMine: boolean): Promise<an
                     // TODO: create bid object here
                     return {
                         coin: c.data.coin.coinid,
+                        amount: c.data.coin.amount,
                         auctionTokenId: c.data.prevstate[2].data,
                         bidderAddress: c.data.prevstate[1].data,
                         bidderPubKey: c.data.prevstate[0].data,
@@ -432,7 +433,15 @@ function selectBid(acceptedBidIndex: number, bidder_script_accress: string, publ
 }
 
 function acceptThisBid(selectedBid: BidToken, myAddress: string, myKey: string) {
-    return acceptBid(selectedBid.auctionTokenId, myAddress, selectedBid.coin, selectedBid.bidderAddress, 2, 44, myKey)
+    return acceptBid(
+        selectedBid.auctionTokenId,
+        myAddress,
+        selectedBid.coin,
+        selectedBid.bidderAddress,
+        selectedBid.amount,
+        44,
+        myKey
+    )
 }
 
 // The Host accepts bid of bidder

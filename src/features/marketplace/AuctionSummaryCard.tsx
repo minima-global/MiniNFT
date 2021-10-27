@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import ButtonGroup from '@mui/material/ButtonGroup'
 import { bidOnAuction } from './marketplace.state'
 import AuctionToken from './Auction'
 
@@ -13,13 +14,26 @@ interface IProps {
 
 const AuctionSummaryCard = ({ auction }: IProps) => {
     const dispatch = useAppDispatch()
+    const [minimaBidAmount, setMinimaBidAmount] = useState(0)
 
     function bidOnAuctionClicked() {
-        dispatch(bidOnAuction(auction))
+        dispatch(bidOnAuction(auction, minimaBidAmount))
+    }
+
+    function onIncrementClicked() {
+        setMinimaBidAmount((bid) => bid + 1)
+    }
+
+    function onDecrementClicked() {
+        if (minimaBidAmount > 0) {
+            setMinimaBidAmount((bid) => bid - 1)
+        }
     }
 
     const imageField: any = auction.description
     let imageUrl = null // populate with image if we have one, or keep null if we don't
+
+    // TODO: move this into the auction object in redux so it doesnt parse on every render
 
     // https://bugzilla.mozilla.org/show_bug.cgi?id=1554068
     // Firefox users still see error in console even if we catch it
@@ -47,7 +61,12 @@ const AuctionSummaryCard = ({ auction }: IProps) => {
                     </Typography>
                     <Typography>coinId: {auction.coin}</Typography>
                     <Typography>tokenId: {auction.tokenid}</Typography>
-                    {auction.own ? null : <Button onClick={bidOnAuctionClicked}>Bid 2 Minima</Button>}
+                    <ButtonGroup variant="outlined" aria-label="outlined button group">
+                        <Button onClick={onDecrementClicked}>-</Button>
+                        <Button disabled>{minimaBidAmount}</Button>
+                        <Button onClick={onIncrementClicked}>+</Button>
+                    </ButtonGroup>
+                    {auction.own ? null : <Button onClick={bidOnAuctionClicked}>Bid Minima</Button>}
                     {imageUrl ? <img src={imageUrl} width="300" height="200"></img> : null}
                 </CardContent>
             </Card>

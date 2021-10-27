@@ -25,8 +25,9 @@ const BidCard = ({ bid }: IProps) => {
                     <Typography variant="h5">
                         {bid.token ? <div>{bid.token}</div> : <div>Token not found</div>}
                     </Typography>
-                    <Typography>coinId: {bid.coin}</Typography>
-                    <Typography>tokenId: {bid.auctionTokenId}</Typography>
+                    <Typography>Coin Id: {bid.coin}</Typography>
+                    <Typography>Token Id: {bid.auctionTokenId}</Typography>
+                    <Typography>Amount: {bid.amount}</Typography>
                     {bid.myToken ? <Button onClick={onAcceptBidClicked}>Accept Bid</Button> : null}
                 </CardContent>
             </Card>
