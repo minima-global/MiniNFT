@@ -21,7 +21,7 @@ export const createUserImageNFT =
         const COMPRESSION_FACTOR_LOW = 0.1
         const COMPRESSION_FACTOR_MEDIUM = 0.5
         const COMPRESSION_FACTOR_HIGH = 0.9
-        Minima_Service.buildUserNFT(imageDataUrl, COMPRESSION_FACTOR_LOW).then(
+        Minima_Service.buildUserNFT(imageDataUrl, COMPRESSION_FACTOR_MEDIUM).then(
             (tkn: string | Token) => {
                 if (isToken(tkn)) {
                     const userImageNFTCreateSuccess = {

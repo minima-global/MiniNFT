@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { listAuctions, selectAllAuctions } from './marketplace.state'
 import AuctionSummaryCard from './AuctionSummaryCard'
+import Grid from '@mui/material/Grid'
 
 const Marketplace = () => {
     const dispatch = useAppDispatch()
@@ -14,9 +15,13 @@ const Marketplace = () => {
     return (
         <>
             <h1>List all auctions ({auctions.length})</h1>
-            {auctions.map((auction, i) => (
-                <AuctionSummaryCard auction={auction}></AuctionSummaryCard>
-            ))}
+            <Grid container spacing={2}>
+                {auctions.map((auction, i) => (
+                    <Grid item xs={12}>
+                        <AuctionSummaryCard auction={auction}></AuctionSummaryCard>
+                    </Grid>
+                ))}
+            </Grid>
         </>
     )
 }
