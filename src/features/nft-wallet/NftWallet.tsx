@@ -3,28 +3,23 @@ import { getAllMyNfts, sendNftToAuction } from './nftwallet.state'
 import { useAppDispatch, useAppSelector } from './../../app/hooks'
 import Button from '@mui/material/Button'
 import { Token } from './../../minima.service'
+import NftCard from './NftfCard'
+import Grid from '@mui/material/Grid'
 
 const NftWallet = () => {
     const dispatch = useAppDispatch()
     const nfts = useAppSelector(getAllMyNfts)
 
-    const onAuctionNft = (nft: Token) => {
-        return () => {
-            dispatch(sendNftToAuction(nft))
-        }
-    }
-
     return (
         <>
             <h1>NFT Wallet</h1>
-            {nfts.map((nft, i) => (
-                <div key={i}>
-                    {nft.token}
-                    <Button variant="text" onClick={onAuctionNft(nft)}>
-                        Auction
-                    </Button>
-                </div>
-            ))}
+            <Grid container spacing={2}>
+                {nfts.map((nft, i) => (
+                    <Grid item xs={12}>
+                        <NftCard key={i} nft={nft}></NftCard>
+                    </Grid>
+                ))}
+            </Grid>
         </>
     )
 }

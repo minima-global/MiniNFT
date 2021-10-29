@@ -31,6 +31,7 @@ const AuctionSummaryCard = ({ auction }: IProps) => {
         }
     }
 
+    const fallbackImage = 'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg'
     const imageField: any = auction.description
     let imageUrl = null // populate with image if we have one, or keep null if we don't
 
@@ -56,7 +57,11 @@ const AuctionSummaryCard = ({ auction }: IProps) => {
     return (
         <>
             <Card>
-                {imageUrl ? <CardMedia component="img" height="194" image={imageUrl} /> : null}
+                {imageUrl ? (
+                    <CardMedia component="img" height="194" image={imageUrl} />
+                ) : (
+                    <CardMedia component="img" height="194" image={fallbackImage} />
+                )}
                 <CardContent>
                     <Typography variant="h5">
                         {auction.token ? <div>{auction.token}</div> : <div>Token not found</div>}
