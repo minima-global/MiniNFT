@@ -377,14 +377,32 @@ function cancelAuction(
     pubKeyUsedInScript: string,
     scale: number
 ) {
-    let minimaAmount = 1 / Math.pow(10, scale)
-    let command = `txncreate 10;
+    return new Promise((resolve, reject) => {
+        let minimaAmount = 1 / Math.pow(10, scale)
+        let command = `txncreate 10;
         txninput 10 ${nftCoinId};
         txnoutput 10 ${minimaAmount} ${selfAddress} ${nftTokenId};
         txnsign 10 ${pubKeyUsedInScript};
         txnpost 10;
         txndelete 10`
-    Minima.cmd(command, console.log)
+        Minima.cmd(command, (responsesArray) => {
+            console.log(responsesArray)
+            // res is an array of responses for each txninput
+            // find the one with txn post
+            const txnPost = responsesArray.find((res: any) => res.minifunc && res.minifunc === 'txnpost 10')
+            if (typeof txnPost === 'undefined') {
+                // no txn post, so get the message from the last txn
+                const lastTxnMsg = responsesArray[responsesArray.length - 1].message
+                reject('Error: No txnpost found, ' + lastTxnMsg)
+            } else {
+                if (txnPost.status && txnPost.message === 'Send Success') {
+                    resolve(txnPost.message)
+                } else {
+                    reject(txnPost.message)
+                }
+            }
+        })
+    })
 }
 
 /**
@@ -814,6 +832,7 @@ const Minima_Service = {
     getAllBidsOwnedWithData,
     getAllMyNFTs,
     createAuction,
+    cancelAuction,
     createBidTransaction,
     acceptThisBid,
     compareTokenLists,

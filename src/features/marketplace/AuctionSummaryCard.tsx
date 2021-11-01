@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import CardMedia from '@mui/material/CardMedia'
-import { bidOnAuction } from './marketplace.state'
+import { bidOnAuction, cancelAuction } from './marketplace.state'
 import AuctionToken from './Auction'
 
 interface IProps {
@@ -19,6 +19,10 @@ const AuctionSummaryCard = ({ auction }: IProps) => {
 
     function bidOnAuctionClicked() {
         dispatch(bidOnAuction(auction, minimaBidAmount))
+    }
+
+    function cancelAuctionClicked() {
+        dispatch(cancelAuction(auction))
     }
 
     function onIncrementClicked() {
@@ -68,14 +72,19 @@ const AuctionSummaryCard = ({ auction }: IProps) => {
                     </Typography>
                     <Typography>coinId: {auction.coin}</Typography>
                     <Typography>tokenId: {auction.tokenid}</Typography>
-                    <div>
-                        <ButtonGroup variant="outlined" aria-label="outlined button group">
-                            <Button onClick={onDecrementClicked}>-</Button>
-                            <Button disabled>{minimaBidAmount}</Button>
-                            <Button onClick={onIncrementClicked}>+</Button>
-                        </ButtonGroup>
-                        {auction.own ? null : <Button onClick={bidOnAuctionClicked}>Bid Minima</Button>}
-                    </div>
+
+                    {auction.own ? (
+                        <Button onClick={cancelAuctionClicked}>Cancel Auction</Button>
+                    ) : (
+                        <div>
+                            <ButtonGroup variant="outlined" aria-label="outlined button group">
+                                <Button onClick={onDecrementClicked}>-</Button>
+                                <Button disabled>{minimaBidAmount}</Button>
+                                <Button onClick={onIncrementClicked}>+</Button>
+                            </ButtonGroup>
+                            <Button onClick={bidOnAuctionClicked}>Bid Minima</Button>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </>

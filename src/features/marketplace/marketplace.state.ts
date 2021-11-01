@@ -49,6 +49,35 @@ export const bidOnAuction =
         )
     }
 
+export const cancelAuction =
+    (auction: any): AppThunk =>
+    (dispatch, getState) => {
+        const state = getState()
+        const myAddress = state.appInit.walletAddress
+        Minima_Service.cancelAuction(auction.coin, myAddress, auction.tokenid, auction.sellerKey, auction.scale).then(
+            (msg) => {
+                const cancelAuctionSuccess = {
+                    message: 'Auction Cancelled, ' + msg,
+                    options: {
+                        key: new Date().getTime() + Math.random(),
+                        variant: 'success',
+                    },
+                }
+                dispatch(enqueueSnackbar(cancelAuctionSuccess))
+            },
+            (msg) => {
+                const cancelAuctionFailure = {
+                    message: 'Auction Cancel Failure, ' + msg,
+                    options: {
+                        key: new Date().getTime() + Math.random(),
+                        variant: 'error',
+                    },
+                }
+                dispatch(enqueueSnackbar(cancelAuctionFailure))
+            }
+        )
+    }
+
 export interface MarketplaceState {
     auctions: any[]
 }
