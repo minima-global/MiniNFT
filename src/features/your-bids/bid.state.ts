@@ -64,6 +64,33 @@ export const acceptBid =
         }
     }
 
+export const cancelBid =
+    (bid: BidToken): AppThunk =>
+    (dispatch, getState) => {
+        Minima_Service.cancelBid(bid.coin, bid.bidderAddress, bid.bidderPubKey, bid.amount).then(
+            (msg) => {
+                const cancelBidSuccess = {
+                    message: 'Bid Cancelled, ' + msg,
+                    options: {
+                        key: new Date().getTime() + Math.random(),
+                        variant: 'success',
+                    },
+                }
+                dispatch(enqueueSnackbar(cancelBidSuccess))
+            },
+            (msg) => {
+                const cancelBidFailure = {
+                    message: 'Bid Cancel Failure, ' + msg,
+                    options: {
+                        key: new Date().getTime() + Math.random(),
+                        variant: 'error',
+                    },
+                }
+                dispatch(enqueueSnackbar(cancelBidFailure))
+            }
+        )
+    }
+
 export interface BidsState {
     bids: any[]
 }

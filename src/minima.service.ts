@@ -699,6 +699,35 @@ function createBidTransaction(
     })
 }
 
+function cancelBid(bidCoinId: string, selfAddress: string, pubKeyUsedInScript: string, minimaAmount: number) {
+    return new Promise((resolve, reject) => {
+        const minimaTokenId = '0x00'
+        let command = `txncreate 10;
+        txninput 10 ${bidCoinId};
+        txnoutput 10 ${minimaAmount} ${selfAddress} ${minimaTokenId};
+        txnsign 10 ${pubKeyUsedInScript};
+        txnpost 10;
+        txndelete 10`
+        Minima.cmd(command, (responsesArray) => {
+            console.log(responsesArray)
+            // res is an array of responses for each txninput
+            // find the one with txn post
+            const txnPost = responsesArray.find((res: any) => res.minifunc && res.minifunc === 'txnpost 10')
+            if (typeof txnPost === 'undefined') {
+                // no txn post, so get the message from the last txn
+                const lastTxnMsg = responsesArray[responsesArray.length - 1].message
+                reject('Error: No txnpost found, ' + lastTxnMsg)
+            } else {
+                if (txnPost.status && txnPost.message === 'Send Success') {
+                    resolve(txnPost.message)
+                } else {
+                    reject(txnPost.message)
+                }
+            }
+        })
+    })
+}
+
 /////////// Art Work /////////////////////////
 
 function buildUserNFT(imageDataUrl: string, compressionFactor: number, nameStr?: string): Promise<string | Token> {
@@ -834,6 +863,7 @@ const Minima_Service = {
     createAuction,
     cancelAuction,
     createBidTransaction,
+    cancelBid,
     acceptThisBid,
     compareTokenLists,
     buildNFT, // with image

@@ -5,7 +5,7 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import { useAppDispatch, useAppSelector } from './../../app/hooks'
-import { acceptBid } from './bid.state'
+import { acceptBid, cancelBid } from './bid.state'
 
 interface IProps {
     bid: Bid
@@ -16,6 +16,10 @@ const BidCard = ({ bid }: IProps) => {
 
     function onAcceptBidClicked() {
         dispatch(acceptBid(bid))
+    }
+
+    function onCancelBidClicked() {
+        dispatch(cancelBid(bid))
     }
 
     return (
@@ -29,6 +33,7 @@ const BidCard = ({ bid }: IProps) => {
                     <Typography>Token Id: {bid.auctionTokenId}</Typography>
                     <Typography>Amount: {bid.amount}</Typography>
                     {bid.myToken ? <Button onClick={onAcceptBidClicked}>Accept Bid</Button> : null}
+                    {bid.madeBid ? <Button onClick={onCancelBidClicked}>Cancel Bid</Button> : null}
                 </CardContent>
             </Card>
         </>
