@@ -8,11 +8,12 @@ import { selectAllAuctions } from './../marketplace/marketplace.state'
 export const listBidsMade = (): AppThunk => (dispatch, getState) => {
     const state = getState()
     const bidAddress = state.appInit.bidContractAddress
+    const auctionAddress = state.appInit.auctionContractAddress
     if (bidAddress === '') {
         console.error(`async error, bid address '' when you read it`) // TODO: notification or action here
         return
     }
-    Minima_Service.getAllBidsOwnedWithData(bidAddress).then((res: any) => {
+    Minima_Service.getAllBidsOwnedDataStale(bidAddress, auctionAddress).then((res: any) => {
         dispatch(bidActions.storeBids(res))
     })
 }
@@ -67,28 +68,52 @@ export const acceptBid =
 export const cancelBid =
     (bid: BidToken): AppThunk =>
     (dispatch, getState) => {
-        Minima_Service.cancelBid(bid.coin, bid.bidderAddress, bid.bidderPubKey, bid.amount).then(
-            (msg) => {
-                const cancelBidSuccess = {
-                    message: 'Bid Cancelled, ' + msg,
-                    options: {
-                        key: new Date().getTime() + Math.random(),
-                        variant: 'success',
-                    },
-                }
-                dispatch(enqueueSnackbar(cancelBidSuccess))
-            },
-            (msg) => {
-                const cancelBidFailure = {
-                    message: 'Bid Cancel Failure, ' + msg,
-                    options: {
-                        key: new Date().getTime() + Math.random(),
-                        variant: 'error',
-                    },
-                }
-                dispatch(enqueueSnackbar(cancelBidFailure))
+        const currentBlock = getState().init.blockNumber
+        const userCanCancelBlockNumber = bid.inblock + 100
+        if (currentBlock === 0) {
+            const waitingForBlock = {
+                message: 'Waiting for latest block. Please try again in 1 minute',
+                options: {
+                    key: new Date().getTime() + Math.random(),
+                    variant: 'info',
+                },
             }
-        )
+            dispatch(enqueueSnackbar(waitingForBlock))
+            return // dont try anything else
+        }
+        if (currentBlock < userCanCancelBlockNumber) {
+            const cancelTooEarly = {
+                message: `Please wait for block ${userCanCancelBlockNumber} before you cancel`,
+                options: {
+                    key: new Date().getTime() + Math.random(),
+                    variant: 'info',
+                },
+            }
+            dispatch(enqueueSnackbar(cancelTooEarly))
+        } else {
+            Minima_Service.cancelBid(bid.coin, bid.bidderAddress, bid.bidderPubKey, bid.amount).then(
+                (msg) => {
+                    const cancelBidSuccess = {
+                        message: 'Bid Cancelled, ' + msg,
+                        options: {
+                            key: new Date().getTime() + Math.random(),
+                            variant: 'success',
+                        },
+                    }
+                    dispatch(enqueueSnackbar(cancelBidSuccess))
+                },
+                (msg) => {
+                    const cancelBidFailure = {
+                        message: 'Bid Cancel Failure, ' + msg,
+                        options: {
+                            key: new Date().getTime() + Math.random(),
+                            variant: 'error',
+                        },
+                    }
+                    dispatch(enqueueSnackbar(cancelBidFailure))
+                }
+            )
+        }
     }
 
 export interface BidsState {

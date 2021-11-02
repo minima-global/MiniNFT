@@ -75,7 +75,7 @@ const minimaLoadedSuccess = {
     message: 'Minima Loaded',
     options: {
         key: new Date().getTime() + Math.random(),
-        variant: 'success',
+        variant: 'info',
     },
 }
 

@@ -263,7 +263,8 @@ function listAllBids(bidsContractAddress: string, justMine: boolean): Promise<an
                     // TODO: create bid object here
                     return {
                         coin: c.data.coin.coinid,
-                        amount: c.data.coin.amount,
+                        amount: parseInt(c.data.coin.amount),
+                        inblock: parseInt(c.data.inblock),
                         auctionTokenId: c.data.prevstate[2].data,
                         bidderAddress: c.data.prevstate[1].data,
                         bidderPubKey: c.data.prevstate[0].data,
@@ -337,6 +338,26 @@ async function getAllBidsOwnedWithData(bidContractAddress: string) {
         }
     })
     return allBidsUpdated
+}
+
+// get all the bids with ownership and token data
+// Add a flag which tells if the bid is stale or not.
+// A bid is stale if that token does not exist in the auction contract
+async function getAllBidsOwnedDataStale(bidContractAddress: string, auctionContractAddress: string) {
+    const allBids = await getAllBidsOwnedWithData(bidContractAddress)
+    const allAuctions = await listAllAuctions(auctionContractAddress, false)
+    const allBidsStale = allBids.map((bid) => {
+        const auctionBidIsFor = allAuctions.find((auction) => auction.tokenid === bid.auctionTokenId)
+        let staleBid = true
+        if (typeof auctionBidIsFor !== 'undefined') {
+            staleBid = false
+        }
+        return {
+            ...bid,
+            staleBid,
+        }
+    })
+    return allBidsStale
 }
 
 //////////////// Seller /////////////////////////////////////////
@@ -688,7 +709,7 @@ function createBidTransaction(
 ) {
     return new Promise((resolve, reject) => {
         const minimaTokenId = '0x00'
-        const sendTransaction = `send ${amount} ${scriptAddress} ${minimaTokenId} 0:${myPubKey}#1:${myAddress}#2:${tokenIdIWant}`
+        const sendTransaction = `send ${amount} ${scriptAddress} ${minimaTokenId} 0:${myPubKey}#1:${myAddress}#2:${tokenIdIWant}` // add coinid
         Minima.cmd(sendTransaction, (res) => {
             if (res.status && res.message === 'Send Success') {
                 resolve(res.message)
@@ -858,7 +879,7 @@ const Minima_Service = {
     createAuctionContract,
     createBidContract,
     getAllAuctionsWithData,
-    getAllBidsOwnedWithData,
+    getAllBidsOwnedDataStale,
     getAllMyNFTs,
     createAuction,
     cancelAuction,

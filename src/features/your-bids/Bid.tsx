@@ -15,6 +15,7 @@ import { Token } from './../../minima.service'
 export interface RawBid {
     coin: string
     amount: number
+    inblock: number
     auctionTokenId: string
     bidderAddress: string
     bidderPubKey: string
@@ -24,4 +25,5 @@ export interface RawBid {
 export default interface BidToken extends RawBid, Token {
     madeBid?: boolean // flag to tell if you made the bid or someone else
     myToken?: boolean // flag to tell if the bid is on one of your own tokens
+    staleBid: boolean // flag to tell if bid is stale (no corresponding auction with same token id)
 }

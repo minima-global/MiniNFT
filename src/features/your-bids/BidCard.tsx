@@ -33,7 +33,10 @@ const BidCard = ({ bid }: IProps) => {
                     <Typography>Token Id: {bid.auctionTokenId}</Typography>
                     <Typography>Amount: {bid.amount}</Typography>
                     {bid.myToken ? <Button onClick={onAcceptBidClicked}>Accept Bid</Button> : null}
-                    {bid.madeBid ? <Button onClick={onCancelBidClicked}>Cancel Bid</Button> : null}
+                    {bid.madeBid ? (
+                        <Button onClick={onCancelBidClicked}>Cancel Bid After Block {bid.inblock + 100}</Button>
+                    ) : null}
+                    {bid.staleBid ? <Typography color="error">Stale</Typography> : null}
                 </CardContent>
             </Card>
         </>
