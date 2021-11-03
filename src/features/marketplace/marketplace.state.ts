@@ -25,7 +25,14 @@ export const bidOnAuction =
             console.error(`async error, bid address, key, or wallet is still '' when you read it`) // TODO: notification or action here
             return
         }
-        Minima_Service.createBidTransaction(bidAmount, bidAddress, myAddress, myKey, auction.tokenid).then(
+        Minima_Service.createBidTransaction(
+            bidAmount,
+            bidAddress,
+            myAddress,
+            myKey,
+            auction.tokenid,
+            auction.coin
+        ).then(
             (msg) => {
                 const bidCreatedSuccess = {
                     message: 'Bid Created, ' + msg,

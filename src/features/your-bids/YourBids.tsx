@@ -19,13 +19,17 @@ const YourBids = () => {
     }, [dispatch])
 
     bids.forEach((bid) => {
-        if (bid.madeBid) {
-            bidsMade.push(bid)
+        if (bid.staleBid) {
+            bidsNotMine.push(bid) // stale = throw away
         } else {
-            if (bid.myToken) {
-                bidsRecieved.push(bid)
+            if (bid.madeBid) {
+                bidsMade.push(bid) // madeBid and  not stale
             } else {
-                bidsNotMine.push(bid)
+                if (bid.myToken) {
+                    bidsRecieved.push(bid) // someone else madeBid and myToken and !stale = recieved a bid on my token
+                } else {
+                    bidsNotMine.push(bid) // someone else made bid on someone else's token = throw away
+                }
             }
         }
     })

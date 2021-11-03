@@ -38,10 +38,11 @@ function createBidContract() {
             'extrascript "LET bidderpubkey  = PREVSTATE(0) ' +
             'LET bidderaddress = PREVSTATE(1) ' +
             'LET token = PREVSTATE(2) ' +
+            'LET auction = PREVSTATE(3) ' +
             'IF SIGNEDBY ( bidderpubkey ) AND @BLKDIFF GT 100 ' +
             'THEN RETURN TRUE ' +
             'ENDIF ' +
-            'RETURN VERIFYOUT (@INPUT bidderaddress 1 token) "'
+            'RETURN VERIFYOUT (@INPUT bidderaddress 1 token) "' // TODO: make it verify token and auction coin id, so stale bods can not be executed
         Minima.cmd(bidScript, (res) => {
             // console.log(res)
             console.log('Set Bidder Script!')
@@ -265,6 +266,7 @@ function listAllBids(bidsContractAddress: string, justMine: boolean): Promise<an
                         coin: c.data.coin.coinid,
                         amount: parseInt(c.data.coin.amount),
                         inblock: parseInt(c.data.inblock),
+                        auctionCoinId: c.data.prevstate[3].data,
                         auctionTokenId: c.data.prevstate[2].data,
                         bidderAddress: c.data.prevstate[1].data,
                         bidderPubKey: c.data.prevstate[0].data,
@@ -347,7 +349,13 @@ async function getAllBidsOwnedDataStale(bidContractAddress: string, auctionContr
     const allBids = await getAllBidsOwnedWithData(bidContractAddress)
     const allAuctions = await listAllAuctions(auctionContractAddress, false)
     const allBidsStale = allBids.map((bid) => {
-        const auctionBidIsFor = allAuctions.find((auction) => auction.tokenid === bid.auctionTokenId)
+        // match tokenId and coinId so relisted nft tokens
+        // will not match with stale bids
+        // ie relisted tokens will have their old bids show up as stale
+        const auctionBidIsFor = allAuctions.find(
+            (auction) => auction.tokenid === bid.auctionTokenId && auction.coin === bid.auctionCoinId
+        )
+
         let staleBid = true
         if (typeof auctionBidIsFor !== 'undefined') {
             staleBid = false
@@ -705,11 +713,12 @@ function createBidTransaction(
     scriptAddress: string,
     myAddress: string,
     myPubKey: string,
-    tokenIdIWant: string
+    tokenIdIWant: string,
+    auctionCoinId: string
 ) {
     return new Promise((resolve, reject) => {
         const minimaTokenId = '0x00'
-        const sendTransaction = `send ${amount} ${scriptAddress} ${minimaTokenId} 0:${myPubKey}#1:${myAddress}#2:${tokenIdIWant}` // add coinid
+        const sendTransaction = `send ${amount} ${scriptAddress} ${minimaTokenId} 0:${myPubKey}#1:${myAddress}#2:${tokenIdIWant}#3:${auctionCoinId}`
         Minima.cmd(sendTransaction, (res) => {
             if (res.status && res.message === 'Send Success') {
                 resolve(res.message)

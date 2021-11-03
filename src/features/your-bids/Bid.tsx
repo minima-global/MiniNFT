@@ -16,6 +16,7 @@ export interface RawBid {
     coin: string
     amount: number
     inblock: number
+    auctionCoinId: string
     auctionTokenId: string
     bidderAddress: string
     bidderPubKey: string
