@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -18,6 +19,7 @@ interface IProps {
 const AuctionSummaryCard = ({ auction }: IProps) => {
     const dispatch = useAppDispatch()
     const [minimaBidAmount, setMinimaBidAmount] = useState(0)
+    let navigate = useNavigate()
 
     const auctionBids = useAppSelector(selectBidsForAuction(auction.coin))
     // console.log(`Bids on ${auction.token}`, auctionBids)
@@ -50,7 +52,7 @@ const AuctionSummaryCard = ({ auction }: IProps) => {
     }
 
     const onImageClicked = (myAuction: AuctionToken) => () => {
-        console.log('image clicked ' + myAuction.token)
+        navigate('/auction/' + myAuction.coin)
     }
 
     const fallbackImage = 'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg'

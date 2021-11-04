@@ -3,7 +3,8 @@ import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import theme from './theme/theme'
 import { useRoutes } from 'react-router-dom'
-import Routes from './Routes'
+import NavbarRoutes from './routes/navbar.routes'
+import AppRoutes from './routes/app.routes'
 import { useAppDispatch } from './app/hooks'
 import { minimaInit } from './minima.init'
 import NavigationBar from './layout/NavigationBar'
@@ -16,8 +17,9 @@ const App = () => {
         dispatch(minimaInit())
     }, [dispatch])
 
+    const allRoutes = (NavbarRoutes as any[]).concat(AppRoutes)
     // helper hook to build the route componants from the Routes array
-    const myRoutes = useRoutes(Routes)
+    const myRoutes = useRoutes(allRoutes)
 
     return (
         <ThemeProvider theme={theme}>

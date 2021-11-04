@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import { NavLink, Outlet, Link, useRoutes } from 'react-router-dom'
-import Routes from './../Routes'
+import NavbarRoutes from '../routes/navbar.routes'
 
 import {
     AppBar,
@@ -65,7 +65,7 @@ const NavigationBar: React.FC = (props: any) => {
             <Drawer open={isOpen} onClose={toggleDrawer(false)}>
                 <div role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
                     <MenuList>
-                        {Routes.map((prop, key) => {
+                        {NavbarRoutes.map((prop, key) => {
                             return (
                                 <Link to={prop.path} style={{ textDecoration: 'none' }} key={key}>
                                     <MenuItem selected={activeRoute(prop.path)}>

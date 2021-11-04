@@ -1,11 +1,11 @@
 import React from 'react'
-import Marketplace from './features/marketplace/Marketplace'
-import MintNft from './features/mint-nft/MintNft'
-import NftWallet from './features/nft-wallet/NftWallet'
-import YourAuctions from './features/your-auctions/YourAuctions'
-import YourBids from './features/your-bids/YourBids'
+import Marketplace from '../features/marketplace/Marketplace'
+import MintNft from '../features/mint-nft/MintNft'
+import NftWallet from '../features/nft-wallet/NftWallet'
+import YourAuctions from '../features/your-auctions/YourAuctions'
+import YourBids from '../features/your-bids/YourBids'
 
-const Routes = [
+const NavbarRoutes = [
     {
         path: '/',
         sidebarName: 'Marketplace',
@@ -33,4 +33,4 @@ const Routes = [
     },
 ]
 
-export default Routes
+export default NavbarRoutes
