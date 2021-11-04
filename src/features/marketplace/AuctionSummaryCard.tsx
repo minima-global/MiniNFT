@@ -8,6 +8,8 @@ import ButtonGroup from '@mui/material/ButtonGroup'
 import CardMedia from '@mui/material/CardMedia'
 import { bidOnAuction, cancelAuction } from './marketplace.state'
 import AuctionToken from './Auction'
+import { selectBidsForAuction } from './../your-bids/bid.state'
+import BidToken from './../your-bids/Bid'
 
 interface IProps {
     auction: AuctionToken
@@ -16,6 +18,18 @@ interface IProps {
 const AuctionSummaryCard = ({ auction }: IProps) => {
     const dispatch = useAppDispatch()
     const [minimaBidAmount, setMinimaBidAmount] = useState(0)
+
+    const auctionBids = useAppSelector(selectBidsForAuction(auction.coin))
+    // console.log(`Bids on ${auction.token}`, auctionBids)
+
+    function getHighestBid(bidList: BidToken[]) {
+        const sorted = bidList.sort((b1, b2) => b2.amount - b1.amount)
+        if (sorted.length > 0) {
+            return sorted[0].amount
+        } else {
+            return 0
+        }
+    }
 
     function bidOnAuctionClicked() {
         dispatch(bidOnAuction(auction, minimaBidAmount))
@@ -35,6 +49,10 @@ const AuctionSummaryCard = ({ auction }: IProps) => {
         }
     }
 
+    const onImageClicked = (myAuction: AuctionToken) => () => {
+        console.log('image clicked ' + myAuction.token)
+    }
+
     const fallbackImage = 'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg'
     const imageField: any = auction.description
     let imageUrl = null // populate with image if we have one, or keep null if we don't
@@ -48,21 +66,21 @@ const AuctionSummaryCard = ({ auction }: IProps) => {
         const doc = parser.parseFromString(imageField, 'application/xml')
         const errorNode2 = doc.querySelector('parsererror')
         if (errorNode2) {
-            console.log('Token does not contain an image: ' + auction.token)
+            // console.log('Token does not contain an image: ' + auction.token)
         } else {
-            console.log('parsing succeeded')
+            // console.log('parsing succeeded')
             var imageString = doc.getElementsByTagName('artimage')[0].innerHTML
             imageUrl = `data:image/jpeg;base64,${imageString}`
         }
     } catch (err) {
-        console.error('Token does not contain an image: ' + auction.token)
+        // console.error('Token does not contain an image: ' + auction.token)
     }
 
     return (
         <>
             <Card>
                 {imageUrl ? (
-                    <CardMedia component="img" height="194" image={imageUrl} />
+                    <CardMedia component="img" height="194" image={imageUrl} onClick={onImageClicked(auction)} />
                 ) : (
                     <CardMedia component="img" height="194" image={fallbackImage} />
                 )}
@@ -72,6 +90,7 @@ const AuctionSummaryCard = ({ auction }: IProps) => {
                     </Typography>
                     <Typography>coinId: {auction.coin}</Typography>
                     <Typography>tokenId: {auction.tokenid}</Typography>
+                    <Typography>Highest Bid: {getHighestBid(auctionBids)}</Typography>
 
                     {auction.own ? (
                         <Button onClick={cancelAuctionClicked}>Cancel Auction</Button>

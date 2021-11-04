@@ -723,6 +723,7 @@ function createBidTransaction(
             if (res.status && res.message === 'Send Success') {
                 resolve(res.message)
             } else {
+                console.error(res)
                 reject(res.message)
             }
         })

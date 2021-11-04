@@ -116,8 +116,9 @@ export const cancelBid =
         }
     }
 
+// TODO: use Bid type
 export interface BidsState {
-    bids: any[]
+    bids: BidToken[]
 }
 
 const initialBidState: BidsState = {
@@ -147,3 +148,12 @@ const selectBids = (state: RootState): BidsState => {
     return state.bids
 }
 export const selectAllBids = createSelector(selectBids, (bids: BidsState) => bids.bids)
+
+// https://github.com/reduxjs/reselect#q-how-do-i-create-a-selector-that-takes-an-argument
+// https://stackoverflow.com/questions/40291084/use-reselect-selector-with-parameters
+const makeSelectBidsForAuction = createSelector(
+    [selectBids, (state: RootState, selectedAuctionCoinId: string) => selectedAuctionCoinId],
+    (bids: BidsState, selectedAuctionCoinId) => bids.bids.filter((bid) => bid.auctionCoinId === selectedAuctionCoinId)
+)
+export const selectBidsForAuction = (selectedAuctionCoinId: string) => (state: RootState) =>
+    makeSelectBidsForAuction(state, selectedAuctionCoinId)

@@ -7,6 +7,6 @@ interface RawAuction {
 }
 
 // We add the token information and flags to the raw auction if we can find it
-export default interface BidToken extends RawAuction, Token {
+export default interface AuctionToken extends RawAuction, Token {
     own: boolean
 }
