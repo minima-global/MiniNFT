@@ -57,7 +57,9 @@ const NftCard = ({ nft }: IProps) => {
                     <Typography variant="h5">
                         {nft.token ? <div>{nft.token}</div> : <div>Token not found</div>}
                     </Typography>
-                    <Typography>tokenId: {nft.tokenid}</Typography>
+                    <Typography component="div" variant="caption">
+                        tokenId: {nft.tokenid}
+                    </Typography>
                     <Button variant="text" onClick={onAuctionNft(nft)}>
                         Auction
                     </Button>

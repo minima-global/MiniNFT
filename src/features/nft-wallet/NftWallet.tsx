@@ -15,7 +15,7 @@ const NftWallet = () => {
             <h1>NFT Wallet</h1>
             <Grid container spacing={2}>
                 {nfts.map((nft, i) => (
-                    <Grid item xs={12}>
+                    <Grid item xs={12} md={6} lg={4} xl={3}>
                         <NftCard key={i} nft={nft}></NftCard>
                     </Grid>
                 ))}

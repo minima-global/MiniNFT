@@ -9,10 +9,11 @@ import Box from '@mui/material/Box'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
 import IconButton from '@mui/material/IconButton'
+import { enqueueSnackbar } from './../../layout/notifications.state'
 
 // Type guards
 function isBlob(blob: null | Blob): blob is Blob {
-    return (blob as Blob).type !== undefined //TODO: will throw an error if null is passed anyway. (null.type => error)
+    return (blob as Blob) !== null && (blob as Blob).type !== undefined
 }
 
 function isString(myString: string | ArrayBuffer | null): myString is string {
@@ -50,13 +51,19 @@ const MintNft = () => {
     }
 
     const createUserImageNftClicked = () => {
-        console.log('create image from', selectedFile)
         if (isBlob(selectedFile)) {
             getDataUrlFromBlob(selectedFile).then((imageDataUrl) => {
                 dispatch(createUserImageNFT(imageDataUrl))
             })
         } else {
-            console.error('Error: Correct file type not selected')
+            const imageSubmitFailure = {
+                message: 'Image Upload Failure: No image selected',
+                options: {
+                    key: new Date().getTime() + Math.random(),
+                    variant: 'error',
+                },
+            }
+            dispatch(enqueueSnackbar(imageSubmitFailure))
         }
     }
 

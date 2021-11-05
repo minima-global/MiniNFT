@@ -18,6 +18,9 @@ export const listBidsMade = (): AppThunk => (dispatch, getState) => {
     })
 }
 
+// TODO: IMPORTANT. We are using the tokenId to search the auction list for the auction this bid relates to.
+// Now we have coinId we should be using that instead
+// In fact we have a new selector, getAuctionByCoinId
 export const acceptBid =
     (bid: BidToken): AppThunk =>
     (dispatch, getState) => {

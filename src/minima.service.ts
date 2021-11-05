@@ -1,5 +1,6 @@
 import { Minima, NetworkStatus, Address, Coin, Token } from 'minima'
 import BidToken from './features/your-bids/Bid'
+import AuctionToken from './features/marketplace/Auction'
 
 // Everything minima related in this app should do through this service
 // Not calling minima library directly
@@ -171,7 +172,7 @@ async function getAllAuctions(auctionContractAddress: string) {
 // objects returned from this function will have different shapes
 // depending on weather they are known or not
 // If known they will have extra properties (name, description, icon etc)
-async function getAllAuctionsWithData(auctionContractAddress: string) {
+async function getAllAuctionsWithData(auctionContractAddress: string): Promise<AuctionToken[]> {
     const allAuctions = await getAllAuctions(auctionContractAddress)
     const allKnownTokens = await getAllKnownTokens()
     const allAuctionsUpdated = allAuctions.map((auction) => {
@@ -189,7 +190,7 @@ async function getAllAuctionsWithData(auctionContractAddress: string) {
 }
 
 // list all the NFTs (coinid and tokenid), listed in the auction
-function listAllAuctions(auctionContractAddress: string, justMine: boolean): Promise<any[]> {
+function listAllAuctions(auctionContractAddress: string, justMine: boolean): Promise<AuctionToken[]> {
     listAllAuctionsTxPow(auctionContractAddress)
     return new Promise((resolve, reject) => {
         let command = 'coins address:' + auctionContractAddress

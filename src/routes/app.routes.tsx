@@ -1,5 +1,5 @@
 import React from 'react'
-import AuctionDetail from './../features/marketplace/AuctionDetail'
+import AuctionDetail from '../features/marketplace/auction-detail/AuctionDetail'
 
 const AppRoutes = [
     {

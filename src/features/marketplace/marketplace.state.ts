@@ -2,6 +2,7 @@ import { createAsyncThunk, createAction, createSlice, PayloadAction, createSelec
 import Minima_Service from './../../minima.service'
 import { RootState, AppThunk } from './../../app/store'
 import { enqueueSnackbar } from './../../layout/notifications.state'
+import AuctionToken from './Auction'
 
 export const listAuctions = (): AppThunk => (dispatch, getState) => {
     const auctionAddress = getState().appInit.auctionContractAddress
@@ -9,8 +10,9 @@ export const listAuctions = (): AppThunk => (dispatch, getState) => {
         console.error(`async error, auction address is still '' when you read it`) // TODO: notification or action here
         return
     }
-    Minima_Service.getAllAuctionsWithData(auctionAddress).then((auctions: any) => {
-        dispatch(marketplaceActions.storeAuctions(auctions))
+    Minima_Service.getAllAuctionsWithData(auctionAddress).then((auctions) => {
+        const imageParsedAuctions = parseImageFromAuction(auctions)
+        dispatch(marketplaceActions.storeAuctions(imageParsedAuctions))
     })
 }
 
@@ -86,7 +88,7 @@ export const cancelAuction =
     }
 
 export interface MarketplaceState {
-    auctions: any[]
+    auctions: AuctionToken[]
 }
 
 const initialMarketplaceState: MarketplaceState = {
@@ -109,7 +111,8 @@ const marketplaceReducer = marketplaceSlice.reducer
 
 export default marketplaceReducer
 
-// selectors
+//////////// selectors///////////
+
 const selectMarketplace = (state: RootState): MarketplaceState => {
     return state.marketplace
 }
@@ -117,3 +120,55 @@ export const selectAllAuctions = createSelector(
     selectMarketplace,
     (marketplace: MarketplaceState) => marketplace.auctions
 )
+
+// Return auctions with the given auction coin id
+const makeSelectAuctionByCoinId = createSelector(
+    [selectMarketplace, (state: RootState, selectedAuctionCoinId: string) => selectedAuctionCoinId],
+    (marketplace: MarketplaceState, selectedAuctionCoinId) =>
+        marketplace.auctions.filter((auction) => auction.coin === selectedAuctionCoinId)
+)
+// will return either an array with the single auction in it [selectedAuction], or empty array []
+export const selectAuctionByCoinId = (selectedAuctionCoinId: string) => (state: RootState) =>
+    makeSelectAuctionByCoinId(state, selectedAuctionCoinId)
+
+// return all auctions that are either own or not own
+const makeSelectOwnAuctions = createSelector(
+    [selectMarketplace, (state: RootState, selectedOwn: boolean) => selectedOwn],
+    (marketplace: MarketplaceState, selectedOwn) =>
+        marketplace.auctions.filter((auction) => auction.own === selectedOwn)
+)
+export const selectOwnAuctions = (selectedOwn: boolean) => (state: RootState) =>
+    makeSelectOwnAuctions(state, selectedOwn)
+
+////////// Helper Functions ///////////
+
+function parseImageFromAuction(auctionList: AuctionToken[]): AuctionToken[] {
+    const auctionWithImageParsed = auctionList.map((auction) => {
+        const fallbackImage = 'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg'
+        const imageField: any = auction.description
+        let imageUrl = fallbackImage // populate with image if we have one, or keep fallback if we don't
+
+        // https://bugzilla.mozilla.org/show_bug.cgi?id=1554068
+        // Firefox users still see error in console even if we catch it
+        try {
+            var parser = new DOMParser()
+            const doc = parser.parseFromString(imageField, 'application/xml')
+            const errorNode2 = doc.querySelector('parsererror')
+            if (errorNode2) {
+                // console.log('Token does not contain an image: ' + auction.token)
+            } else {
+                // console.log('parsing succeeded')
+                var imageString = doc.getElementsByTagName('artimage')[0].innerHTML
+                imageUrl = `data:image/jpeg;base64,${imageString}`
+            }
+        } catch (err) {
+            // console.error('Token does not contain an image: ' + auction.token)
+        }
+
+        return {
+            ...auction,
+            imageUrl,
+        }
+    })
+    return auctionWithImageParsed
+}
