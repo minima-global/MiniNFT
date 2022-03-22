@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-
+import { ReactComponent as WeTransferLogo } from './we-transfer-logo.svg'
 import { NavLink, Outlet, Link, useRoutes } from 'react-router-dom'
 import NavbarRoutes from '../routes/navbar.routes'
 
@@ -13,6 +13,7 @@ import {
     MenuItem,
     ListItemText,
     Button,
+    Box,
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 
@@ -43,7 +44,7 @@ const NavigationBar: React.FC = (props: any) => {
     return (
         <div>
             <div>
-                <AppBar position="static">
+                <AppBar position="static" style={{ background: 'rgb(22, 22, 22)' }}>
                     <Toolbar>
                         <IconButton
                             size="large"
@@ -55,9 +56,13 @@ const NavigationBar: React.FC = (props: any) => {
                         >
                             <MenuIcon />
                         </IconButton>
-                        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                            Nice Fucking Token
+                        <Box sx={{ pt: 1, mr: 1 }}>
+                            <WeTransferLogo></WeTransferLogo>
+                        </Box>
+                        <Typography variant="h6" component="div" sx={{ flexGrow: 1, pt: 1 }}>
+                            NFT
                         </Typography>
+
                         <Typography>{blockNumberString}</Typography>
                     </Toolbar>
                 </AppBar>
