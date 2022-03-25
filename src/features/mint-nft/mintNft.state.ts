@@ -16,12 +16,13 @@ function isToken(token: string | Token): token is Token {
 }
 
 export const createUserImageNFT =
-    (imageDataUrl: string): AppThunk =>
+    ({ imageDataUrl, nftName }: { imageDataUrl: string; nftName: string }): AppThunk =>
     (dispatch, getState) => {
         const COMPRESSION_FACTOR_LOW = 0.1
         const COMPRESSION_FACTOR_MEDIUM = 0.5
         const COMPRESSION_FACTOR_HIGH = 0.9
-        Minima_Service.buildUserNFT(imageDataUrl, COMPRESSION_FACTOR_MEDIUM).then(
+        const quotedNftName = `"${nftName}"`
+        Minima_Service.buildUserNFT(imageDataUrl, COMPRESSION_FACTOR_MEDIUM, quotedNftName).then(
             (tkn: string | Token) => {
                 if (isToken(tkn)) {
                     const userImageNFTCreateSuccess = {

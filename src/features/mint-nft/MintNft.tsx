@@ -10,6 +10,7 @@ import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
 import IconButton from '@mui/material/IconButton'
 import { enqueueSnackbar } from './../../layout/notifications.state'
+import TextField from '@mui/material/TextField'
 
 // Type guards
 function isBlob(blob: null | Blob): blob is Blob {
@@ -24,6 +25,7 @@ const MintNft = () => {
     const dispatch = useAppDispatch()
     const [selectedFile, setSelectedFile] = useState<Blob | null>(null)
     const [myImageSrc, setMyImageSrc] = useState('')
+    const [nftName, setNftName] = useState('')
 
     function createNftClicked() {
         dispatch(createNFT())
@@ -43,6 +45,10 @@ const MintNft = () => {
         objectFit: 'cover',
     })
 
+    const onNameChange = (event: any) => {
+        setNftName(event.target.value)
+    }
+
     const handleCapture = ({ target }: any) => {
         setSelectedFile(target.files[0])
         getDataUrlFromBlob(target.files[0]).then((imageDataUrl) => {
@@ -53,7 +59,7 @@ const MintNft = () => {
     const createUserImageNftClicked = () => {
         if (isBlob(selectedFile)) {
             getDataUrlFromBlob(selectedFile).then((imageDataUrl) => {
-                dispatch(createUserImageNFT(imageDataUrl))
+                dispatch(createUserImageNFT({ imageDataUrl, nftName }))
             })
         } else {
             const imageSubmitFailure = {
@@ -118,18 +124,8 @@ const MintNft = () => {
                 >
                     {setImage()}
                 </Box>
-                {/* <Button variant="contained" component="span" onClick={createNftClicked}>
-                    Create NFT
-                </Button>
-                <Button variant="contained" component="span" onClick={createImageNftClicked}>
-                    Create Image NFT
-                </Button> */}
-                {/* <label htmlFor="contained-button-file">
-                    <Input accept="image/*" id="contained-button-file" type="file" onChange={handleCapture} />
-                    <Button variant="contained" component="span">
-                        Upload
-                    </Button>
-                </label> */}
+
+                <TextField label="Title" variant="outlined" value={nftName} onChange={onNameChange} />
                 <Button variant="contained" component="span" onClick={createUserImageNftClicked}>
                     Create User Image NFT
                 </Button>
