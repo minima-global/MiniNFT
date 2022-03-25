@@ -21,11 +21,11 @@ const NavbarRoutes = [
         sidebarName: 'NFT Wallet',
         element: <NftWallet></NftWallet>,
     },
-    {
-        path: '/myauctions',
-        sidebarName: 'Your Auctions',
-        element: <YourAuctions></YourAuctions>,
-    },
+    // {
+    //     path: '/myauctions',
+    //     sidebarName: 'Your Auctions',
+    //     element: <YourAuctions></YourAuctions>,
+    // },
     {
         path: '/mybids',
         sidebarName: 'Your Bids',
